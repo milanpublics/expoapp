@@ -30,6 +30,10 @@ export default function ActivityGrid({
   const colWidth = dotSize + DOT_GAP;
   const numWeeks = Math.floor(availableWidth / colWidth);
 
+  // The grid content width and its left offset due to justifyContent: "center"
+  const gridContentWidth = numWeeks * dotSize + (numWeeks - 1) * DOT_GAP;
+  const gridOffset = (availableWidth - gridContentWidth) / 2;
+
   const { grid, monthLabels, maxCount } = useMemo(() => {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -147,17 +151,70 @@ export default function ActivityGrid({
         </View>
       </View>
       <View style={styles.monthRow}>
-        {monthLabels.map((ml, i) => (
-          <Text
-            key={i}
-            style={[
-              styles.monthText,
-              { color: colors.textMuted, left: ml.colIdx * colWidth },
-            ]}
-          >
-            {ml.label}
-          </Text>
-        ))}
+        {monthLabels.map((ml, i) => {
+          // Column left edge position (accounting for grid centering offset)
+          const col1Left = gridOffset + ml.colIdx * colWidth;
+          const col2Left = gridOffset + (ml.colIdx + 1) * colWidth;
+          // Width spanning two columns: dotSize + gap + dotSize
+          const twoColWidth = dotSize + DOT_GAP + dotSize;
+
+          if (lang === "zh") {
+            // Chinese: e.g. "1月" → number centered under col1, "月" centered under col2
+            const num = ml.label.replace(/月$/, "");
+            // Use a wider container to fit 2-digit months, centered on the column
+            const numWidth = 20;
+            const numLeft = col1Left + dotSize / 2 - numWidth / 2;
+            return (
+              <React.Fragment key={i}>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.monthText,
+                    {
+                      color: colors.textMuted,
+                      left: numLeft,
+                      width: numWidth,
+                      textAlign: "center",
+                    },
+                  ]}
+                >
+                  {num}
+                </Text>
+                <Text
+                  style={[
+                    styles.monthText,
+                    {
+                      color: colors.textMuted,
+                      left: col2Left,
+                      width: dotSize,
+                      textAlign: "center",
+                    },
+                  ]}
+                >
+                  月
+                </Text>
+              </React.Fragment>
+            );
+          }
+
+          // English: center the abbreviation across col1 and col2
+          return (
+            <Text
+              key={i}
+              style={[
+                styles.monthText,
+                {
+                  color: colors.textMuted,
+                  left: col1Left,
+                  width: twoColWidth,
+                  textAlign: "center",
+                },
+              ]}
+            >
+              {ml.label}
+            </Text>
+          );
+        })}
       </View>
     </View>
   );
@@ -175,5 +232,10 @@ const styles = StyleSheet.create({
   column: {},
   dot: {},
   monthRow: { height: 16, marginTop: 4, position: "relative" },
-  monthText: { fontSize: 9, fontWeight: "500", position: "absolute", top: 0 },
+  monthText: {
+    fontSize: 9,
+    fontWeight: "500",
+    position: "absolute",
+    top: 0,
+  },
 });
