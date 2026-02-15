@@ -56,6 +56,7 @@ export default function ProjectCard({
       if (diffDays <= 7) return t.dueInDays(diffDays);
     }
     if (remaining > 0) return t.tasksLeft(remaining);
+    if (totalTasks === 0) return t.noTasksAdded;
     return t.allTasksDone;
   };
 

@@ -1,5 +1,6 @@
 import AppDialog from "@/components/AppDialog";
 import ProgressBar from "@/components/ProgressBar";
+import TaskInputModal from "@/components/TaskInputModal";
 import TaskItem from "@/components/TaskItem";
 import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
@@ -11,14 +12,13 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,8 +28,8 @@ export default function ProjectDetailScreen() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const [project, setProject] = useState<Project | null>(null);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [taskModalVisible, setTaskModalVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -66,18 +66,18 @@ export default function ProjectDetailScreen() {
     await updateProject(updated);
   };
 
-  const addTask = async () => {
-    if (!project || !newTaskTitle.trim()) return;
+  const addTask = async (title: string, description: string) => {
+    if (!project) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newTask: Task = {
       id: `t_${Date.now()}`,
-      title: newTaskTitle.trim(),
-      description: "",
+      title: title,
+      description: description,
       completed: false,
     };
     const updated = { ...project, tasks: [...project.tasks, newTask] };
     setProject(updated);
-    setNewTaskTitle("");
+    setTaskModalVisible(false);
     await updateProject(updated);
   };
 
@@ -239,26 +239,22 @@ export default function ProjectDetailScreen() {
             />
           ))}
 
-          <TouchableOpacity style={styles.addTaskRow} activeOpacity={1}>
-            <MaterialCommunityIcons
-              name="plus"
-              size={20}
-              color={colors.textMuted}
-              style={{ marginRight: Spacing.lg }}
-            />
-            <TextInput
-              style={[styles.addTaskInput, { color: colors.textPrimary }]}
-              placeholder={t.addNewTask}
-              placeholderTextColor={colors.textMuted}
-              value={newTaskTitle}
-              onChangeText={setNewTaskTitle}
-              onSubmitEditing={addTask}
-              returnKeyType="done"
-            />
-          </TouchableOpacity>
-
           <View style={{ height: 120 }} />
         </ScrollView>
+
+        <TouchableOpacity
+          style={[
+            styles.fab,
+            {
+              backgroundColor: colors.primary,
+              shadowColor: colors.primary,
+            },
+          ]}
+          onPress={() => setTaskModalVisible(true)}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="plus" size={32} color="#FFFFFF" />
+        </TouchableOpacity>
 
         {project.status !== "completed" && (
           <View
@@ -300,6 +296,12 @@ export default function ProjectDetailScreen() {
           { label: t.deleteProject, onPress: confirmDelete, destructive: true },
         ]}
       />
+
+      <TaskInputModal
+        visible={taskModalVisible}
+        onClose={() => setTaskModalVisible(false)}
+        onAdd={addTask}
+      />
     </SafeAreaView>
   );
 }
@@ -339,13 +341,20 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { fontSize: FontSize.sm },
   divider: { height: StyleSheet.hairlineWidth, marginVertical: Spacing.md },
-  addTaskRow: {
-    flexDirection: "row",
+  fab: {
+    position: "absolute",
+    right: Spacing.xl,
+    bottom: Spacing.xxl + 80, // Above the bottom bar or safe area
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
-    paddingVertical: Spacing.md,
-    marginTop: Spacing.sm,
+    justifyContent: "center",
+    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  addTaskInput: { flex: 1, fontSize: FontSize.md, padding: 0 },
   bottomBar: {
     position: "absolute",
     bottom: 0,

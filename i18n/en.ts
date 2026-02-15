@@ -21,10 +21,15 @@ export const en = {
   dueInDays: (days: number) => `Due in ${days} days`,
   tasksLeft: (n: number) => `${n} task${n > 1 ? "s" : ""} left`,
   allTasksDone: "All tasks done",
+  noTasksAdded: "No tasks added",
 
   // Project Detail
   progress: "PROGRESS",
   addNewTask: "Add a new task",
+  taskTitle: "Task Title",
+  taskDescription: "Description (optional)",
+  cancel: "Cancel",
+  add: "Add",
   markComplete: "Mark Complete",
   deleteProject: "Delete Project",
   deleteConfirm: (name: string) => `Are you sure you want to delete "${name}"?`,
@@ -86,7 +91,6 @@ export const en = {
   deleteAllData: "Delete all projects and tasks",
   resetAllData: "Reset All Data",
   resetConfirm: "This will delete all your projects and tasks. Are you sure?",
-  cancel: "Cancel",
   reset: "Reset",
   done: "Done",
   resetSuccess:

@@ -166,7 +166,12 @@ export default function ActivityGrid({
 const styles = StyleSheet.create({
   wrapper: {},
   body: { flexDirection: "row" },
-  gridContainer: { flexDirection: "row", gap: DOT_GAP, flex: 1 },
+  gridContainer: {
+    flexDirection: "row",
+    gap: DOT_GAP,
+    flex: 1,
+    justifyContent: "center",
+  },
   column: {},
   dot: {},
   monthRow: { height: 16, marginTop: 4, position: "relative" },
