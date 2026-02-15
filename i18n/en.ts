@@ -29,6 +29,8 @@ export const en = {
   taskTitle: "Task Title",
   taskDescription: "Description (optional)",
   cancel: "Cancel",
+  deleteTask: "Delete Task",
+  deleteTaskConfirm: "Are you sure you want to delete this task?",
   add: "Add",
   markComplete: "Mark Complete",
   deleteProject: "Delete Project",

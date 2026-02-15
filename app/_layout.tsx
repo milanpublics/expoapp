@@ -3,15 +3,16 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider as NavThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider as NavThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -42,13 +43,15 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <I18nProvider>
-        <UserProvider>
-          <RootLayoutNav />
-        </UserProvider>
-      </I18nProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <I18nProvider>
+          <UserProvider>
+            <RootLayoutNav />
+          </UserProvider>
+        </I18nProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 

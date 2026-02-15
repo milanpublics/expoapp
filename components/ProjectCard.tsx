@@ -5,6 +5,7 @@ import { PRIORITY_LEVELS, Project, PROJECT_CATEGORIES } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
 interface ProjectCardProps {
   project: Project;
@@ -162,11 +163,38 @@ export default function ProjectCard({
             )}
           </View>
         </View>
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={22}
-          color={colors.textMuted}
-        />
+
+        {/* Progress Ring */}
+        {project.status !== "completed" && totalTasks > 0 && (
+          <View style={styles.progressContainer}>
+            <Svg width={20} height={20} viewBox="0 0 20 20">
+              <Circle
+                stroke={colors.border}
+                strokeWidth={3}
+                cx={10}
+                cy={10}
+                r={8}
+                fill="transparent"
+              />
+              <Circle
+                stroke={colors.primary}
+                strokeWidth={3}
+                cx={10}
+                cy={10}
+                r={8}
+                fill="transparent"
+                strokeDasharray={8 * 2 * Math.PI}
+                strokeDashoffset={
+                  8 * 2 * Math.PI -
+                  (completedTasks / totalTasks) * (8 * 2 * Math.PI)
+                }
+                strokeLinecap="round"
+                rotation="-90"
+                origin="10, 10"
+              />
+            </Svg>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -213,4 +241,11 @@ const styles = StyleSheet.create({
   },
   priDot: { width: 6, height: 6, borderRadius: 3 },
   priText: { fontSize: 10, fontWeight: "600" },
+
+  progressContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: Spacing.sm,
+    marginRight: Spacing.sm,
+  },
 });

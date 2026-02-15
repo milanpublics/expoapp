@@ -18,7 +18,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,6 +30,7 @@ export default function ProjectDetailScreen() {
   const [project, setProject] = useState<Project | null>(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [taskModalVisible, setTaskModalVisible] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -100,6 +101,22 @@ export default function ProjectDetailScreen() {
       await deleteProject(id);
       router.back();
     }
+  };
+
+  const confirmTaskDelete = (taskId: string) => {
+    setTaskToDelete(taskId);
+  };
+
+  const deleteTask = async () => {
+    if (!project || !taskToDelete) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    const updated = {
+      ...project,
+      tasks: project.tasks.filter((t) => t.id !== taskToDelete),
+    };
+    setProject(updated);
+    setTaskToDelete(null);
+    await updateProject(updated);
   };
 
   if (!project) {
@@ -236,25 +253,38 @@ export default function ProjectDetailScreen() {
               key={task.id}
               task={task}
               onToggle={() => toggleTask(task.id)}
+              onDelete={() => confirmTaskDelete(task.id)}
             />
           ))}
 
-          <View style={{ height: 120 }} />
-        </ScrollView>
+          <TouchableOpacity
+            style={[
+              styles.addTaskBtn,
+              {
+                borderRadius: BorderRadius.lg,
+                // backgroundColor: isDark ? "#ffffff10" : "#f5f5f5",
+              },
+            ]}
+            onPress={() => setTaskModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="plus"
+              size={24}
+              color={colors.primary}
+            />
+            <Text
+              style={[
+                styles.addTaskText,
+                { color: colors.primary, marginLeft: Spacing.sm },
+              ]}
+            >
+              {t.addNewTask}
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.fab,
-            {
-              backgroundColor: colors.primary,
-              shadowColor: colors.primary,
-            },
-          ]}
-          onPress={() => setTaskModalVisible(true)}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="plus" size={32} color="#FFFFFF" />
-        </TouchableOpacity>
+          <View style={{ height: 100 }} />
+        </ScrollView>
 
         {project.status !== "completed" && (
           <View
@@ -302,6 +332,17 @@ export default function ProjectDetailScreen() {
         onClose={() => setTaskModalVisible(false)}
         onAdd={addTask}
       />
+
+      <AppDialog
+        visible={!!taskToDelete}
+        title={t.deleteTask}
+        message={t.deleteTaskConfirm}
+        onClose={() => setTaskToDelete(null)}
+        actions={[
+          { label: t.cancel, onPress: () => setTaskToDelete(null) },
+          { label: t.deleteTask, onPress: deleteTask, destructive: true },
+        ]}
+      />
     </SafeAreaView>
   );
 }
@@ -341,19 +382,20 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { fontSize: FontSize.sm },
   divider: { height: StyleSheet.hairlineWidth, marginVertical: Spacing.md },
-  fab: {
-    position: "absolute",
-    right: Spacing.xl,
-    bottom: Spacing.xxl + 80, // Above the bottom bar or safe area
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  addTaskBtn: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    elevation: 8,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: "transparent",
+    borderStyle: "dashed",
+  },
+  addTaskText: {
+    fontSize: FontSize.md,
+    fontWeight: "600",
   },
   bottomBar: {
     position: "absolute",
