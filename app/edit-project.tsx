@@ -1,12 +1,13 @@
 import DatePicker from "@/components/DatePicker";
+import TagSelector from "@/components/TagSelector";
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-    Priority,
-    PRIORITY_LEVELS,
-    Project,
-    PROJECT_CATEGORIES,
+  Priority,
+  PRIORITY_LEVELS,
+  Project,
+  PROJECT_CATEGORIES,
 } from "@/types";
 import { getProject, updateProject } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,16 +16,16 @@ import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -47,6 +48,7 @@ export default function EditProjectScreen() {
     undefined,
   );
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [originalProject, setOriginalProject] = useState<Project | null>(null);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export default function EditProjectScreen() {
               ? p.customIconUri
               : "",
           );
+          setSelectedTags(p.tags || []);
           setLoaded(true);
         }
       });
@@ -120,6 +123,7 @@ export default function EditProjectScreen() {
       category: selectedCategory,
       priority: selectedPriority,
       dueDate: dueDate ? dueDate.toISOString().slice(0, 10) : undefined,
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
     };
     await updateProject(updated);
     router.back();
@@ -237,51 +241,6 @@ export default function EditProjectScreen() {
             onChangeText={setTitle}
           />
 
-          {/* Category */}
-          <Text style={[styles.label, { color: colors.textSecondary }]}>
-            {t.category}
-          </Text>
-          <View style={styles.chipWrap}>
-            {PROJECT_CATEGORIES.map((cat) => {
-              const active = selectedCategory === cat.key;
-              const label = (t as any)[`cat_${cat.key}`] || cat.key;
-              return (
-                <TouchableOpacity
-                  key={cat.key}
-                  style={[
-                    styles.catChip,
-                    {
-                      backgroundColor: active
-                        ? cat.color + "20"
-                        : colors.cardBgLight,
-                      borderColor: active ? cat.color : "transparent",
-                      borderRadius: borderRadius.full,
-                    },
-                  ]}
-                  onPress={() => {
-                    setSelectedCategory(cat.key);
-                    Haptics.selectionAsync();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <MaterialCommunityIcons
-                    name={cat.icon as any}
-                    size={16}
-                    color={active ? cat.color : colors.textMuted}
-                  />
-                  <Text
-                    style={[
-                      styles.catChipText,
-                      { color: active ? cat.color : colors.textSecondary },
-                    ]}
-                  >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
           {/* Priority */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t.priority}
@@ -322,6 +281,22 @@ export default function EditProjectScreen() {
               );
             })}
           </View>
+
+          {/* Tags */}
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            {t.tags}
+          </Text>
+          <TagSelector
+            selectedTagIds={selectedTags}
+            onToggle={(id) =>
+              setSelectedTags((prev) =>
+                prev.includes(id)
+                  ? prev.filter((tid) => tid !== id)
+                  : [...prev, id],
+              )
+            }
+            onTagCreated={(tag) => setSelectedTags((prev) => [...prev, tag.id])}
+          />
 
           {/* Custom Image */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>

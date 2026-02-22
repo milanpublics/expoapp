@@ -5,14 +5,13 @@ import TaskItem from "@/components/TaskItem";
 import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { CustomTag, Priority, PRIORITY_LEVELS, Project, Task } from "@/types";
 import {
-  Priority,
-  PRIORITY_LEVELS,
-  Project,
-  PROJECT_CATEGORIES,
-  Task,
-} from "@/types";
-import { deleteProject, getProject, updateProject } from "@/utils/storage";
+  deleteProject,
+  getProject,
+  getTags,
+  updateProject,
+} from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -34,13 +33,17 @@ export default function ProjectDetailScreen() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const [project, setProject] = useState<Project | null>(null);
+  const [allTags, setAllTags] = useState<CustomTag[]>([]);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [taskModalVisible, setTaskModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      if (id) getProject(id).then(setProject);
+      if (id) {
+        getProject(id).then(setProject);
+        getTags().then(setAllTags);
+      }
     }, [id]),
   );
 
@@ -234,77 +237,110 @@ export default function ProjectDetailScreen() {
             {project.title}
           </Text>
 
-          {/* Tags */}
-          <View style={styles.tagRow}>
-            {(() => {
-              const catDef = PROJECT_CATEGORIES.find(
-                (c) => c.key === project.category,
-              );
-              if (!catDef) return null;
-              const label = (t as any)[`cat_${catDef.key}`] || catDef.key;
-              return (
-                <View
-                  style={[styles.tag, { backgroundColor: catDef.color + "18" }]}
+          {/* Priority */}
+          {(() => {
+            const priDef = PRIORITY_LEVELS.find(
+              (p) => p.key === project.priority,
+            );
+            const showPriority = !!priDef;
+            const showStatus =
+              project.status === "on-hold" || project.status === "completed";
+            if (!showPriority && !showStatus) return null;
+            return (
+              <View style={styles.labeledSection}>
+                <Text
+                  style={[styles.sectionLabel, { color: colors.textMuted }]}
                 >
-                  <MaterialCommunityIcons
-                    name={catDef.icon as any}
-                    size={13}
-                    color={catDef.color}
-                  />
-                  <Text style={[styles.tagText, { color: catDef.color }]}>
-                    {label}
-                  </Text>
-                </View>
-              );
-            })()}
-            {(() => {
-              const priDef = PRIORITY_LEVELS.find(
-                (p) => p.key === project.priority,
-              );
-              if (!priDef) return null;
-              const label = (t as any)[`pri_${priDef.key}`] || priDef.key;
-              return (
-                <View
-                  style={[styles.tag, { backgroundColor: priDef.color + "18" }]}
-                >
-                  <View
-                    style={[styles.tagDot, { backgroundColor: priDef.color }]}
-                  />
-                  <Text style={[styles.tagText, { color: priDef.color }]}>
-                    {label}
-                  </Text>
-                </View>
-              );
-            })()}
-            {project.status === "on-hold" && (
-              <View
-                style={[styles.tag, { backgroundColor: colors.amber + "18" }]}
-              >
-                <MaterialCommunityIcons
-                  name="pause-circle-outline"
-                  size={13}
-                  color={colors.amber}
-                />
-                <Text style={[styles.tagText, { color: colors.amber }]}>
-                  {t.onHold}
+                  {t.priority}
                 </Text>
+                <View style={styles.tagRow}>
+                  {priDef && (
+                    <View
+                      style={[
+                        styles.tag,
+                        { backgroundColor: priDef.color + "18" },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.tagDot,
+                          { backgroundColor: priDef.color },
+                        ]}
+                      />
+                      <Text style={[styles.tagText, { color: priDef.color }]}>
+                        {(t as any)[`pri_${priDef.key}`] || priDef.key}
+                      </Text>
+                    </View>
+                  )}
+                  {project.status === "on-hold" && (
+                    <View
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.amber + "18" },
+                      ]}
+                    >
+                      <MaterialCommunityIcons
+                        name="pause-circle-outline"
+                        size={13}
+                        color={colors.amber}
+                      />
+                      <Text style={[styles.tagText, { color: colors.amber }]}>
+                        {t.onHold}
+                      </Text>
+                    </View>
+                  )}
+                  {project.status === "completed" && (
+                    <View
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "18" },
+                      ]}
+                    >
+                      <MaterialCommunityIcons
+                        name="check-circle-outline"
+                        size={13}
+                        color={colors.primary}
+                      />
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {t.completedStatus}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
-            )}
-            {project.status === "completed" && (
-              <View
-                style={[styles.tag, { backgroundColor: colors.primary + "18" }]}
-              >
-                <MaterialCommunityIcons
-                  name="check-circle-outline"
-                  size={13}
-                  color={colors.primary}
-                />
-                <Text style={[styles.tagText, { color: colors.primary }]}>
-                  {t.completedStatus}
-                </Text>
+            );
+          })()}
+
+          {/* Custom Tags */}
+          {project.tags && project.tags.length > 0 && (
+            <View style={styles.labeledSection}>
+              <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>
+                {t.tags}
+              </Text>
+              <View style={styles.tagRow}>
+                {project.tags.map((tid) => {
+                  const tag = allTags.find((t) => t.id === tid);
+                  if (!tag) return null;
+                  return (
+                    <View
+                      key={tag.id}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: tag.color + "18" },
+                      ]}
+                    >
+                      <View
+                        style={[styles.tagDot, { backgroundColor: tag.color }]}
+                      />
+                      <Text style={[styles.tagText, { color: tag.color }]}>
+                        {tag.name}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
-            )}
-          </View>
+            </View>
+          )}
 
           <View style={styles.meta}>
             {formatDueDate() && (
@@ -474,7 +510,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.xs,
+  },
+  labeledSection: {
     marginBottom: Spacing.sm,
+  },
+  sectionLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
   tag: {
     flexDirection: "row",

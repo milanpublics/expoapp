@@ -25,6 +25,31 @@ export const PROJECT_CATEGORIES: CategoryDef[] = [
   { key: "other", icon: "dots-horizontal-circle-outline", color: "#B0BEC5" },
 ];
 
+export interface CustomTag {
+  id: string;
+  name: string;
+  color: string;
+}
+
+/** Soft pastel palette for random tag colors */
+export const TAG_COLORS = [
+  "#FF6B6B",
+  "#FFA06B",
+  "#FFD93D",
+  "#6BCB77",
+  "#4D96FF",
+  "#9B59B6",
+  "#E056A0",
+  "#00B8A9",
+  "#F38181",
+  "#AA96DA",
+  "#45B7D1",
+  "#96CEB4",
+  "#FFEAA7",
+  "#DDA0DD",
+  "#98D8C8",
+];
+
 export const PRIORITY_LEVELS: { key: Priority; color: string }[] = [
   { key: "low", color: "#B0BEC5" },
   { key: "medium", color: "#FFD740" },
@@ -43,6 +68,7 @@ export interface Project {
   dueDate?: string; // ISO date string
   status: "active" | "completed" | "on-hold";
   tasks: Task[];
+  tags?: string[]; // CustomTag id array
   createdAt: string;
 }
 

@@ -1,4 +1,5 @@
 import DatePicker from "@/components/DatePicker";
+import TagSelector from "@/components/TagSelector";
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -45,6 +46,7 @@ export default function NewProjectScreen() {
     undefined,
   );
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const catDef =
     PROJECT_CATEGORIES.find((c) => c.key === selectedCategory) ||
@@ -98,6 +100,7 @@ export default function NewProjectScreen() {
       dueDate: dueDate ? dueDate.toISOString().slice(0, 10) : undefined,
       status: "active",
       tasks: [],
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
       createdAt: new Date().toISOString(),
     };
     await addProject(newProject);
@@ -217,51 +220,6 @@ export default function NewProjectScreen() {
             autoFocus
           />
 
-          {/* Category */}
-          <Text style={[styles.label, { color: colors.textSecondary }]}>
-            {t.category}
-          </Text>
-          <View style={styles.chipWrap}>
-            {PROJECT_CATEGORIES.map((cat) => {
-              const active = selectedCategory === cat.key;
-              const label = (t as any)[`cat_${cat.key}`] || cat.key;
-              return (
-                <TouchableOpacity
-                  key={cat.key}
-                  style={[
-                    styles.catChip,
-                    {
-                      backgroundColor: active
-                        ? cat.color + "20"
-                        : colors.cardBgLight,
-                      borderColor: active ? cat.color : "transparent",
-                      borderRadius: borderRadius.full,
-                    },
-                  ]}
-                  onPress={() => {
-                    setSelectedCategory(cat.key);
-                    Haptics.selectionAsync();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <MaterialCommunityIcons
-                    name={cat.icon as any}
-                    size={16}
-                    color={active ? cat.color : colors.textMuted}
-                  />
-                  <Text
-                    style={[
-                      styles.catChipText,
-                      { color: active ? cat.color : colors.textSecondary },
-                    ]}
-                  >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
           {/* Priority */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t.priority}
@@ -302,6 +260,22 @@ export default function NewProjectScreen() {
               );
             })}
           </View>
+
+          {/* Tags */}
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            {t.tags}
+          </Text>
+          <TagSelector
+            selectedTagIds={selectedTags}
+            onToggle={(id) =>
+              setSelectedTags((prev) =>
+                prev.includes(id)
+                  ? prev.filter((tid) => tid !== id)
+                  : [...prev, id],
+              )
+            }
+            onTagCreated={(tag) => setSelectedTags((prev) => [...prev, tag.id])}
+          />
 
           {/* Custom Image */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>

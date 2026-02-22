@@ -73,6 +73,18 @@ export const zh: Translations = {
   pri_high: "高",
   pri_urgent: "紧急",
 
+  tags: "标签",
+  manageTags: "标签管理",
+  manageTagsDesc: "创建和管理项目标签",
+  addTag: "新建标签",
+  tagName: "标签名称",
+  enterTagName: "输入标签名（最多8个字符）",
+  deleteTagConfirm: (name: string) => `删除标签"${name}"？将从所有项目中移除。`,
+  deleteTagTitle: "删除标签",
+  noTags: "暂无标签",
+  noTagsHint: "创建标签来组织你的项目",
+  tagUsedCount: (n: number) => `在 ${n} 个项目中使用`,
+
   settings: "设置",
   appearance: "外观",
   light: "浅色",

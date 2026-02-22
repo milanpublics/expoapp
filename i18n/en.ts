@@ -77,6 +77,20 @@ export const en = {
   pri_high: "High",
   pri_urgent: "Urgent",
 
+  // Tags
+  tags: "Tags",
+  manageTags: "Manage Tags",
+  manageTagsDesc: "Create and manage project tags",
+  addTag: "New Tag",
+  tagName: "Tag Name",
+  enterTagName: "Enter tag name (max 8 chars)",
+  deleteTagConfirm: (name: string) =>
+    `Delete tag "${name}"? It will be removed from all projects.`,
+  deleteTagTitle: "Delete Tag",
+  noTags: "No tags yet",
+  noTagsHint: "Create tags to organize your projects",
+  tagUsedCount: (n: number) => `Used in ${n} project${n !== 1 ? "s" : ""}`,
+
   // Settings
   settings: "Settings",
   appearance: "APPEARANCE",

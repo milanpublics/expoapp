@@ -82,6 +82,12 @@ export default function SettingsScreen() {
       action: () => {},
     },
     {
+      icon: "tag-multiple-outline",
+      title: t.manageTags,
+      subtitle: t.manageTagsDesc,
+      action: () => router.push("/manage-tags"),
+    },
+    {
       icon: "cloud-upload-outline",
       title: t.backupSync,
       subtitle: t.cloudBackup,
