@@ -5,11 +5,11 @@ import { PRIORITY_LEVELS, Task } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useRef } from "react";
 import {
-    Animated,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
@@ -111,19 +111,11 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
             {priDef &&
               (task.priority === "high" || task.priority === "urgent") &&
               !task.completed && (
-                <View
-                  style={[
-                    styles.priBadge,
-                    { backgroundColor: priDef.color + "18" },
-                  ]}
-                >
-                  <View
-                    style={[styles.priDot, { backgroundColor: priDef.color }]}
-                  />
-                  <Text style={[styles.priText, { color: priDef.color }]}>
-                    {(t as any)[`pri_${priDef.key}`] || priDef.key}
-                  </Text>
-                </View>
+                <MaterialCommunityIcons
+                  name="flag"
+                  size={14}
+                  color={priDef.color}
+                />
               )}
           </View>
           {task.description ? (
@@ -162,29 +154,12 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   title: {
     fontSize: FontSize.md,
     fontWeight: "500",
     flexShrink: 1,
-  },
-  priBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 999,
-  },
-  priDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-  },
-  priText: {
-    fontSize: 10,
-    fontWeight: "600",
   },
   description: {
     fontSize: FontSize.xs,

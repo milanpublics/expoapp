@@ -5,15 +5,15 @@ import { PRIORITY_LEVELS, Priority } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 interface TaskInputModalProps {
@@ -31,13 +31,13 @@ export default function TaskInputModal({
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<Priority>("medium");
+  const [priority, setPriority] = useState<Priority>("low");
 
   useEffect(() => {
     if (visible) {
       setTitle("");
       setDescription("");
-      setPriority("medium");
+      setPriority("low");
     }
   }, [visible]);
 
@@ -151,8 +151,10 @@ export default function TaskInputModal({
                       onPress={() => setPriority(p.key)}
                       activeOpacity={0.7}
                     >
-                      <View
-                        style={[styles.priDot, { backgroundColor: p.color }]}
+                      <MaterialCommunityIcons
+                        name="flag"
+                        size={12}
+                        color={p.color}
                       />
                       <Text
                         style={[
@@ -275,11 +277,6 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: Spacing.sm,
     borderWidth: 1.5,
-  },
-  priDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
   },
   priLabel: {
     fontSize: FontSize.xs,
