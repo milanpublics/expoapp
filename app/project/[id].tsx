@@ -24,6 +24,7 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -37,7 +38,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, borderRadius } = useTheme();
   const { t, lang } = useI18n();
   const [project, setProject] = useState<Project | null>(null);
   const [allTags, setAllTags] = useState<CustomTag[]>([]);
@@ -240,6 +241,15 @@ export default function ProjectDetailScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Banner Image */}
+          {project.customIconUri ? (
+            <Image
+              source={{ uri: project.customIconUri }}
+              style={[styles.banner, { borderRadius: borderRadius.lg }]}
+              resizeMode="cover"
+            />
+          ) : null}
+
           <Text style={[styles.title, { color: colors.textPrimary }]}>
             {project.title}
           </Text>
@@ -517,6 +527,11 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xxl,
     fontWeight: "700",
     marginBottom: Spacing.sm,
+  },
+  banner: {
+    width: "100%",
+    height: 140,
+    marginBottom: Spacing.md,
   },
   tagRow: {
     flexDirection: "row",

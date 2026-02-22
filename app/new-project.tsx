@@ -4,10 +4,10 @@ import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-    Priority,
-    PRIORITY_LEVELS,
-    Project,
-    PROJECT_CATEGORIES,
+  Priority,
+  PRIORITY_LEVELS,
+  Project,
+  PROJECT_CATEGORIES,
 } from "@/types";
 import { addProject } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -16,16 +16,16 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -141,7 +141,7 @@ export default function NewProjectScreen() {
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View style={styles.header}>
           <TouchableOpacity
@@ -401,7 +401,7 @@ export default function NewProjectScreen() {
             onClose={() => setShowDatePicker(false)}
           />
 
-          <View style={{ height: 40 }} />
+          <View style={{ height: 200 }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

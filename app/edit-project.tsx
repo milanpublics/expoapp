@@ -165,7 +165,7 @@ export default function EditProjectScreen() {
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View style={styles.header}>
           <TouchableOpacity
@@ -422,7 +422,7 @@ export default function EditProjectScreen() {
             onClose={() => setShowDatePicker(false)}
           />
 
-          <View style={{ height: 40 }} />
+          <View style={{ height: 200 }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
