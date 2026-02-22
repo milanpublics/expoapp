@@ -84,6 +84,7 @@ export const zh: Translations = {
   noTags: "暂无标签",
   noTagsHint: "创建标签来组织你的项目",
   tagUsedCount: (n: number) => `在 ${n} 个项目中使用`,
+  noProjectsForTag: "暂无项目使用此标签",
 
   settings: "设置",
   appearance: "外观",

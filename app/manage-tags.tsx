@@ -126,39 +126,52 @@ export default function ManageTagsScreen() {
         )}
 
         {tags.map((tag) => (
-          <View
+          <TouchableOpacity
             key={tag.id}
-            style={[
-              styles.tagRow,
-              {
-                backgroundColor: colors.cardBgLight,
-                borderRadius: borderRadius.lg,
-              },
-            ]}
+            activeOpacity={0.7}
+            onPress={() =>
+              router.push({
+                pathname: "/tag-projects",
+                params: { tagId: tag.id },
+              })
+            }
           >
-            <View style={[styles.colorDot, { backgroundColor: tag.color }]} />
-            <View style={styles.tagInfo}>
-              <Text
-                style={[styles.tagName, { color: colors.textPrimary }]}
-                numberOfLines={1}
-              >
-                {tag.name}
-              </Text>
-              <Text style={[styles.tagUsage, { color: colors.textMuted }]}>
-                {t.tagUsedCount(tagUsage[tag.id] || 0)}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => setDeleteTarget(tag)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            <View
+              style={[
+                styles.tagRow,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  borderRadius: borderRadius.lg,
+                },
+              ]}
             >
-              <MaterialCommunityIcons
-                name="trash-can-outline"
-                size={20}
-                color={colors.danger}
-              />
-            </TouchableOpacity>
-          </View>
+              <View style={[styles.colorDot, { backgroundColor: tag.color }]} />
+              <View style={styles.tagInfo}>
+                <Text
+                  style={[styles.tagName, { color: colors.textPrimary }]}
+                  numberOfLines={1}
+                >
+                  {tag.name}
+                </Text>
+                <Text style={[styles.tagUsage, { color: colors.textMuted }]}>
+                  {t.tagUsedCount(tagUsage[tag.id] || 0)}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setDeleteTarget(tag);
+                }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <MaterialCommunityIcons
+                  name="trash-can-outline"
+                  size={20}
+                  color={colors.danger}
+                />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
         ))}
 
         {/* Create tag inline */}

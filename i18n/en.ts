@@ -90,6 +90,7 @@ export const en = {
   noTags: "No tags yet",
   noTagsHint: "Create tags to organize your projects",
   tagUsedCount: (n: number) => `Used in ${n} project${n !== 1 ? "s" : ""}`,
+  noProjectsForTag: "No projects use this tag yet",
 
   // Settings
   settings: "Settings",

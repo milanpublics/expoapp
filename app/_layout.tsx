@@ -3,9 +3,9 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider as NavThemeProvider,
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -123,6 +123,20 @@ function RootLayoutNav() {
             presentation: "modal",
             headerShown: false,
             animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="manage-tags"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="tag-projects"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
           }}
         />
       </Stack>
