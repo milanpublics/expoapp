@@ -1,6 +1,7 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { PRIORITY_LEVELS, Priority } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -18,7 +19,7 @@ import {
 interface TaskInputModalProps {
   visible: boolean;
   onClose: () => void;
-  onAdd: (title: string, description: string) => void;
+  onAdd: (title: string, description: string, priority: Priority) => void;
 }
 
 export default function TaskInputModal({
@@ -30,17 +31,19 @@ export default function TaskInputModal({
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
 
   useEffect(() => {
     if (visible) {
       setTitle("");
       setDescription("");
+      setPriority("medium");
     }
   }, [visible]);
 
   const handleAdd = () => {
     if (!title.trim()) return;
-    onAdd(title.trim(), description.trim());
+    onAdd(title.trim(), description.trim(), priority);
   };
 
   return (
@@ -98,7 +101,7 @@ export default function TaskInputModal({
               placeholderTextColor={colors.textMuted}
               value={title}
               onChangeText={setTitle}
-              autoFocus={true} // Auto focus on open
+              autoFocus={true}
             />
 
             <TextInput
@@ -118,6 +121,55 @@ export default function TaskInputModal({
               multiline
               textAlignVertical="top"
             />
+
+            {/* Priority Selector */}
+            <View>
+              <Text
+                style={[styles.sectionLabel, { color: colors.textSecondary }]}
+              >
+                {t.taskPriority}
+              </Text>
+              <View style={styles.priorityRow}>
+                {PRIORITY_LEVELS.map((p) => {
+                  const selected = priority === p.key;
+                  const label = (t as any)[`pri_${p.key}`] || p.key;
+                  return (
+                    <TouchableOpacity
+                      key={p.key}
+                      style={[
+                        styles.priorityPill,
+                        {
+                          backgroundColor: selected
+                            ? p.color + "25"
+                            : isDark
+                              ? "#ffffff10"
+                              : "#f5f5f5",
+                          borderColor: selected ? p.color : "transparent",
+                          borderRadius: borderRadius.md,
+                        },
+                      ]}
+                      onPress={() => setPriority(p.key)}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={[styles.priDot, { backgroundColor: p.color }]}
+                      />
+                      <Text
+                        style={[
+                          styles.priLabel,
+                          {
+                            color: selected ? p.color : colors.textSecondary,
+                            fontWeight: selected ? "700" : "500",
+                          },
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
           </View>
 
           <View style={styles.footer}>
@@ -178,7 +230,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: Spacing.xl,
-    paddingBottom: Platform.OS === "ios" ? 40 : Spacing.xl, // Safe area for iOS
+    paddingBottom: Platform.OS === "ios" ? 40 : Spacing.xl,
     elevation: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
@@ -205,6 +257,32 @@ const styles = StyleSheet.create({
   },
   textArea: {
     height: 100,
+  },
+  sectionLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: "600",
+    marginBottom: Spacing.sm,
+  },
+  priorityRow: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+  },
+  priorityPill: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1.5,
+  },
+  priDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  priLabel: {
+    fontSize: FontSize.xs,
   },
   footer: {
     flexDirection: "row",

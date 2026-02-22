@@ -5,7 +5,13 @@ import TaskItem from "@/components/TaskItem";
 import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Project, Task } from "@/types";
+import {
+  Priority,
+  PRIORITY_LEVELS,
+  Project,
+  PROJECT_CATEGORIES,
+  Task,
+} from "@/types";
 import { deleteProject, getProject, updateProject } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -67,7 +73,11 @@ export default function ProjectDetailScreen() {
     await updateProject(updated);
   };
 
-  const addTask = async (title: string, description: string) => {
+  const addTask = async (
+    title: string,
+    description: string,
+    priority: Priority,
+  ) => {
     if (!project) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newTask: Task = {
@@ -75,6 +85,7 @@ export default function ProjectDetailScreen() {
       title: title,
       description: description,
       completed: false,
+      priority: priority,
     };
     const updated = { ...project, tasks: [...project.tasks, newTask] };
     setProject(updated);
@@ -223,6 +234,78 @@ export default function ProjectDetailScreen() {
             {project.title}
           </Text>
 
+          {/* Tags */}
+          <View style={styles.tagRow}>
+            {(() => {
+              const catDef = PROJECT_CATEGORIES.find(
+                (c) => c.key === project.category,
+              );
+              if (!catDef) return null;
+              const label = (t as any)[`cat_${catDef.key}`] || catDef.key;
+              return (
+                <View
+                  style={[styles.tag, { backgroundColor: catDef.color + "18" }]}
+                >
+                  <MaterialCommunityIcons
+                    name={catDef.icon as any}
+                    size={13}
+                    color={catDef.color}
+                  />
+                  <Text style={[styles.tagText, { color: catDef.color }]}>
+                    {label}
+                  </Text>
+                </View>
+              );
+            })()}
+            {(() => {
+              const priDef = PRIORITY_LEVELS.find(
+                (p) => p.key === project.priority,
+              );
+              if (!priDef) return null;
+              const label = (t as any)[`pri_${priDef.key}`] || priDef.key;
+              return (
+                <View
+                  style={[styles.tag, { backgroundColor: priDef.color + "18" }]}
+                >
+                  <View
+                    style={[styles.tagDot, { backgroundColor: priDef.color }]}
+                  />
+                  <Text style={[styles.tagText, { color: priDef.color }]}>
+                    {label}
+                  </Text>
+                </View>
+              );
+            })()}
+            {project.status === "on-hold" && (
+              <View
+                style={[styles.tag, { backgroundColor: colors.amber + "18" }]}
+              >
+                <MaterialCommunityIcons
+                  name="pause-circle-outline"
+                  size={13}
+                  color={colors.amber}
+                />
+                <Text style={[styles.tagText, { color: colors.amber }]}>
+                  {t.onHold}
+                </Text>
+              </View>
+            )}
+            {project.status === "completed" && (
+              <View
+                style={[styles.tag, { backgroundColor: colors.primary + "18" }]}
+              >
+                <MaterialCommunityIcons
+                  name="check-circle-outline"
+                  size={13}
+                  color={colors.primary}
+                />
+                <Text style={[styles.tagText, { color: colors.primary }]}>
+                  {t.completedStatus}
+                </Text>
+              </View>
+            )}
+          </View>
+
           <View style={styles.meta}>
             {formatDueDate() && (
               <View style={styles.metaItem}>
@@ -248,14 +331,28 @@ export default function ProjectDetailScreen() {
           <ProgressBar progress={progress} label={t.progress} />
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          {project.tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={() => toggleTask(task.id)}
-              onDelete={() => confirmTaskDelete(task.id)}
-            />
-          ))}
+          {(() => {
+            const priorityOrder: Record<string, number> = {
+              urgent: 0,
+              high: 1,
+              medium: 2,
+              low: 3,
+            };
+            const sorted = [...project.tasks].sort((a, b) => {
+              if (a.completed !== b.completed) return a.completed ? 1 : -1;
+              const pa = priorityOrder[a.priority || "medium"] ?? 2;
+              const pb = priorityOrder[b.priority || "medium"] ?? 2;
+              return pa - pb;
+            });
+            return sorted.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={() => toggleTask(task.id)}
+                onDelete={() => confirmTaskDelete(task.id)}
+              />
+            ));
+          })()}
 
           <TouchableOpacity
             style={[
@@ -372,6 +469,29 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xxl,
     fontWeight: "700",
     marginBottom: Spacing.sm,
+  },
+  tagRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  tagDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  tagText: {
+    fontSize: FontSize.xs,
+    fontWeight: "600",
   },
   meta: {
     flexDirection: "row",

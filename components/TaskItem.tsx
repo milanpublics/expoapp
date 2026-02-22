@@ -1,14 +1,15 @@
 import { FontSize, Spacing } from "@/constants/theme";
+import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Task } from "@/types";
+import { PRIORITY_LEVELS, Task } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useRef } from "react";
 import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
@@ -20,7 +21,12 @@ interface TaskItemProps {
 
 export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
   const { colors } = useTheme();
+  const { t } = useI18n();
   const swipeableRef = useRef<Swipeable>(null);
+
+  const priDef = task.priority
+    ? PRIORITY_LEVELS.find((p) => p.key === task.priority)
+    : null;
 
   const renderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
@@ -88,19 +94,38 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
         </View>
 
         <View style={styles.content}>
-          <Text
-            style={[
-              styles.title,
-              { color: colors.textPrimary },
-              task.completed && {
-                color: colors.textMuted,
-                textDecorationLine: "line-through",
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {task.title}
-          </Text>
+          <View style={styles.titleRow}>
+            <Text
+              style={[
+                styles.title,
+                { color: colors.textPrimary },
+                task.completed && {
+                  color: colors.textMuted,
+                  textDecorationLine: "line-through",
+                },
+              ]}
+              numberOfLines={1}
+            >
+              {task.title}
+            </Text>
+            {priDef &&
+              (task.priority === "high" || task.priority === "urgent") &&
+              !task.completed && (
+                <View
+                  style={[
+                    styles.priBadge,
+                    { backgroundColor: priDef.color + "18" },
+                  ]}
+                >
+                  <View
+                    style={[styles.priDot, { backgroundColor: priDef.color }]}
+                  />
+                  <Text style={[styles.priText, { color: priDef.color }]}>
+                    {(t as any)[`pri_${priDef.key}`] || priDef.key}
+                  </Text>
+                </View>
+              )}
+          </View>
           {task.description ? (
             <Text
               style={[styles.description, { color: colors.textSecondary }]}
@@ -134,9 +159,32 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   title: {
     fontSize: FontSize.md,
     fontWeight: "500",
+    flexShrink: 1,
+  },
+  priBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 999,
+  },
+  priDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+  },
+  priText: {
+    fontSize: 10,
+    fontWeight: "600",
   },
   description: {
     fontSize: FontSize.xs,

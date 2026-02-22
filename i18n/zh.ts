@@ -27,6 +27,7 @@ export const zh: Translations = {
   addNewTask: "添加新任务",
   taskTitle: "任务标题",
   taskDescription: "任务内容（可选）",
+  taskPriority: "优先级",
   cancel: "取消",
   deleteTask: "删除任务",
   deleteTaskConfirm: "确定要删除这个任务吗？",
