@@ -5,7 +5,14 @@ import TaskItem from "@/components/TaskItem";
 import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { CustomTag, Priority, PRIORITY_LEVELS, Project, Task } from "@/types";
+import {
+  CustomTag,
+  Priority,
+  PRIORITY_LEVELS,
+  Project,
+  tagTextColor,
+  Task,
+} from "@/types";
 import {
   deleteProject,
   getProject,
@@ -324,15 +331,20 @@ export default function ProjectDetailScreen() {
                   return (
                     <View
                       key={tag.id}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: tag.color + "18" },
-                      ]}
+                      style={[styles.tag, { backgroundColor: tag.color }]}
                     >
                       <View
-                        style={[styles.tagDot, { backgroundColor: tag.color }]}
+                        style={[
+                          styles.tagDot,
+                          { backgroundColor: tagTextColor(tag.color) },
+                        ]}
                       />
-                      <Text style={[styles.tagText, { color: tag.color }]}>
+                      <Text
+                        style={[
+                          styles.tagText,
+                          { color: tagTextColor(tag.color) },
+                        ]}
+                      >
                         {tag.name}
                       </Text>
                     </View>

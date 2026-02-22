@@ -54,10 +54,10 @@ export const DarkColors: ThemeColors = {
 };
 
 export const LightColors: ThemeColors = {
-  background: "#F5F5FA",
-  cardBg: "#FFFFFF",
-  cardBgLight: "#F0F0F8",
-  surfaceBg: "#E8E8F0",
+  background: "#F0F0F5",
+  cardBg: "#FAFAFD",
+  cardBgLight: "#EBEBF3",
+  surfaceBg: "#E3E3EC",
 
   primary: "#00C853",
   primaryDark: "#00A844",

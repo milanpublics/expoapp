@@ -1,7 +1,7 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { CustomTag, TAG_COLORS } from "@/types";
+import { CustomTag, TAG_COLORS, tagTextColor } from "@/types";
 import { addTag, getTags } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -78,7 +78,7 @@ export default function TagSelector({
                 styles.chip,
                 {
                   backgroundColor: selected
-                    ? tag.color + "25"
+                    ? tag.color
                     : isDark
                       ? "#ffffff10"
                       : "#f5f5f5",
@@ -92,11 +92,24 @@ export default function TagSelector({
               }}
               activeOpacity={0.7}
             >
-              <View style={[styles.tagDot, { backgroundColor: tag.color }]} />
+              <View
+                style={[
+                  styles.tagDot,
+                  {
+                    backgroundColor: selected
+                      ? tagTextColor(tag.color)
+                      : tag.color,
+                  },
+                ]}
+              />
               <Text
                 style={[
                   styles.chipText,
-                  { color: selected ? tag.color : colors.textSecondary },
+                  {
+                    color: selected
+                      ? tagTextColor(tag.color)
+                      : colors.textSecondary,
+                  },
                 ]}
               >
                 {tag.name}
