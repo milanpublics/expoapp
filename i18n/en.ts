@@ -129,6 +129,10 @@ export const en = {
 
   // Tab
   tabSettings: "Settings",
+  tabProfileCenter: "Me",
+  profileCenter: "Personal Center",
+  settingsPage: "Settings",
+  quickActions: "QUICK ACTIONS",
   sharp: "Sharp",
   round: "Round",
   medium: "Medium",

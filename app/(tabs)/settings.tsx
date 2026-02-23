@@ -1,56 +1,29 @@
 import ActivityGrid from "@/components/ActivityGrid";
-import AppDialog from "@/components/AppDialog";
 import { FontSize, Spacing } from "@/constants/theme";
-import { Language, useI18n } from "@/contexts/I18nContext";
+import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
 import { Project } from "@/types";
-import { getProjects, resetData } from "@/utils/storage";
+import { getProjects } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type ThemeMode = "light" | "dark" | "system";
-
-const THEME_OPTIONS: {
-  mode: ThemeMode;
-  labelKey: "light" | "dark" | "system";
-  icon: string;
-}[] = [
-  { mode: "light", labelKey: "light", icon: "white-balance-sunny" },
-  { mode: "dark", labelKey: "dark", icon: "moon-waning-crescent" },
-  { mode: "system", labelKey: "system", icon: "cellphone" },
-];
-
-const LANG_OPTIONS: { lang: Language; label: string }[] = [
-  { lang: "en", label: "EN" },
-  { lang: "zh", label: "中文" },
-];
-
-export default function SettingsScreen() {
-  const {
-    colors,
-    mode,
-    setMode,
-    borderRadiusScale,
-    setBorderRadiusScale,
-    borderRadius,
-  } = useTheme();
-  const { t, lang, setLang } = useI18n();
+export default function ProfileCenterScreen() {
+  const { colors, borderRadius } = useTheme();
+  const { t } = useI18n();
   const { profile } = useUser();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [resetDialogVisible, setResetDialogVisible] = useState(false);
-  const [resetDoneVisible, setResetDoneVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -58,47 +31,34 @@ export default function SettingsScreen() {
     }, []),
   );
 
-  const handleResetConfirm = async () => {
-    await resetData();
-    setResetDialogVisible(false);
-    setResetDoneVisible(true);
-  };
-
   const cardHPadding = Spacing.md * 2;
   const screenHPadding = Spacing.xl * 2;
   const totalPadding = cardHPadding + screenHPadding;
 
-  const settingsItems = [
+  const quickActions = [
     {
-      icon: "account-circle-outline",
+      icon: "account-circle-outline" as const,
       title: t.profile,
       subtitle: t.manageProfile,
       action: () => router.push("/profile"),
     },
     {
-      icon: "bell-outline",
-      title: t.notifications,
-      subtitle: t.configureAlerts,
-      action: () => {},
-    },
-    {
-      icon: "tag-multiple-outline",
+      icon: "tag-multiple-outline" as const,
       title: t.manageTags,
       subtitle: t.manageTagsDesc,
       action: () => router.push("/manage-tags"),
     },
     {
-      icon: "cloud-upload-outline",
+      icon: "cloud-upload-outline" as const,
       title: t.backupSync,
       subtitle: t.cloudBackup,
       action: () => {},
     },
     {
-      icon: "trash-can-outline",
-      title: t.resetData,
-      subtitle: t.deleteAllData,
-      action: () => setResetDialogVisible(true),
-      danger: true,
+      icon: "bell-outline" as const,
+      title: t.notifications,
+      subtitle: t.configureAlerts,
+      action: () => {},
     },
   ];
 
@@ -132,7 +92,7 @@ export default function SettingsScreen() {
               >
                 <MaterialCommunityIcons
                   name="account"
-                  size={24}
+                  size={28}
                   color={colors.textMuted}
                 />
               </View>
@@ -140,7 +100,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <View style={{ flex: 1, marginLeft: Spacing.lg }}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>
-              {t.settings}
+              {t.profileCenter}
             </Text>
             {profile.name ? (
               <Text style={[styles.nameText, { color: colors.textSecondary }]}>
@@ -148,6 +108,23 @@ export default function SettingsScreen() {
               </Text>
             ) : null}
           </View>
+          <TouchableOpacity
+            onPress={() => router.push("/app-settings")}
+            activeOpacity={0.7}
+            style={[
+              styles.settingsBtn,
+              {
+                backgroundColor: colors.cardBg,
+                borderRadius: borderRadius.md,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="cog-outline"
+              size={22}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Activity */}
@@ -163,154 +140,9 @@ export default function SettingsScreen() {
           <ActivityGrid projects={projects} containerPadding={totalPadding} />
         </View>
 
-        {/* Appearance - inline chips */}
+        {/* Quick Actions */}
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.appearance}
-        </Text>
-        <View
-          style={[
-            styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
-          ]}
-        >
-          {THEME_OPTIONS.map((opt) => {
-            const active = mode === opt.mode;
-            return (
-              <TouchableOpacity
-                key={opt.mode}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: active
-                      ? colors.primarySoft
-                      : "transparent",
-                    borderColor: active ? colors.primary : colors.border,
-                    borderRadius: borderRadius.md,
-                  },
-                ]}
-                onPress={() => setMode(opt.mode)}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons
-                  name={opt.icon as any}
-                  size={15}
-                  color={active ? colors.primary : colors.textMuted}
-                />
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: active ? colors.primary : colors.textSecondary },
-                  ]}
-                >
-                  {t[opt.labelKey]}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* Language - inline chips */}
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.language}
-        </Text>
-        <View
-          style={[
-            styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
-          ]}
-        >
-          {LANG_OPTIONS.map((opt) => {
-            const active = lang === opt.lang;
-            return (
-              <TouchableOpacity
-                key={opt.lang}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: active
-                      ? colors.primarySoft
-                      : "transparent",
-                    borderColor: active ? colors.primary : colors.border,
-                    borderRadius: borderRadius.md,
-                  },
-                ]}
-                onPress={() => setLang(opt.lang)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: active ? colors.primary : colors.textSecondary },
-                  ]}
-                >
-                  {opt.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* Border Radius */}
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.borderRadius}
-        </Text>
-        <View
-          style={[
-            styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
-          ]}
-        >
-          {(
-            [
-              { scale: 0.5, label: t.sharp, radius: 2 },
-              { scale: 1, label: t.medium, radius: 8 },
-              { scale: 1.5, label: t.round, radius: 16 },
-            ] as const
-          ).map((opt) => {
-            const active = borderRadiusScale === opt.scale;
-            return (
-              <TouchableOpacity
-                key={opt.scale}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: active
-                      ? colors.primarySoft
-                      : "transparent",
-                    borderColor: active ? colors.primary : colors.border,
-                    borderRadius: borderRadius.md,
-                  },
-                ]}
-                onPress={() => setBorderRadiusScale(opt.scale)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.brPreview,
-                    {
-                      backgroundColor: active
-                        ? colors.primary
-                        : colors.textMuted,
-                      borderRadius: opt.radius,
-                    },
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: active ? colors.primary : colors.textSecondary },
-                  ]}
-                >
-                  {opt.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* General */}
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.general}
+          {t.quickActions}
         </Text>
         <View
           style={[
@@ -318,12 +150,12 @@ export default function SettingsScreen() {
             { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
           ]}
         >
-          {settingsItems.map((item, index) => (
+          {quickActions.map((item, index) => (
             <TouchableOpacity
               key={item.title}
               style={[
-                styles.settingsItem,
-                index < settingsItems.length - 1 && [
+                styles.listItem,
+                index < quickActions.length - 1 && [
                   styles.itemBorder,
                   { borderBottomColor: colors.border },
                 ],
@@ -331,35 +163,22 @@ export default function SettingsScreen() {
               onPress={item.action}
               activeOpacity={0.7}
             >
-              <View
-                style={[
-                  styles.iconBg,
-                  {
-                    backgroundColor: item.danger
-                      ? "rgba(255,82,82,0.15)"
-                      : colors.primarySoft,
-                    borderRadius: borderRadius.sm,
-                  },
-                ]}
-              >
+              <View style={styles.listItemIcon}>
                 <MaterialCommunityIcons
-                  name={item.icon as any}
-                  size={20}
-                  color={item.danger ? colors.danger : colors.primary}
+                  name={item.icon}
+                  size={22}
+                  color={colors.primary}
                 />
               </View>
-              <View style={styles.settingsContent}>
+              <View style={styles.listItemContent}>
                 <Text
-                  style={[
-                    styles.settingsTitle,
-                    { color: item.danger ? colors.danger : colors.textPrimary },
-                  ]}
+                  style={[styles.listItemTitle, { color: colors.textPrimary }]}
                 >
                   {item.title}
                 </Text>
                 <Text
                   style={[
-                    styles.settingsSubtitle,
+                    styles.listItemSubtitle,
                     { color: colors.textSecondary },
                   ]}
                 >
@@ -375,31 +194,51 @@ export default function SettingsScreen() {
           ))}
         </View>
 
+        {/* Settings Entry */}
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+          {t.general}
+        </Text>
+        <TouchableOpacity
+          style={[
+            styles.settingsEntry,
+            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+          ]}
+          onPress={() => router.push("/app-settings")}
+          activeOpacity={0.7}
+        >
+          <View style={styles.settingsEntryIcon}>
+            <MaterialCommunityIcons
+              name="cog-outline"
+              size={22}
+              color={colors.primary}
+            />
+          </View>
+          <View style={styles.settingsEntryContent}>
+            <Text
+              style={[styles.settingsEntryTitle, { color: colors.textPrimary }]}
+            >
+              {t.settingsPage}
+            </Text>
+            <Text
+              style={[
+                styles.settingsEntrySubtitle,
+                { color: colors.textSecondary },
+              ]}
+            >
+              {t.appearance}, {t.language}, {t.general}
+            </Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={18}
+            color={colors.textMuted}
+          />
+        </TouchableOpacity>
+
         <Text style={[styles.version, { color: colors.textMuted }]}>
           Clean Tracker v1.0.0
         </Text>
       </ScrollView>
-
-      {/* Reset confirmation dialog */}
-      <AppDialog
-        visible={resetDialogVisible}
-        title={t.resetAllData}
-        message={t.resetConfirm}
-        onClose={() => setResetDialogVisible(false)}
-        actions={[
-          { label: t.cancel, onPress: () => setResetDialogVisible(false) },
-          { label: t.reset, onPress: handleResetConfirm, destructive: true },
-        ]}
-      />
-
-      {/* Reset done dialog */}
-      <AppDialog
-        visible={resetDoneVisible}
-        title={t.done}
-        message={t.resetSuccess}
-        onClose={() => setResetDoneVisible(false)}
-        actions={[{ label: t.done, onPress: () => setResetDoneVisible(false) }]}
-      />
     </SafeAreaView>
   );
 }
@@ -417,16 +256,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: Spacing.xl,
   },
-  avatarImage: { width: 48, height: 48, borderRadius: 24 },
+  avatarImage: { width: 52, height: 52, borderRadius: 26 },
   avatarPlaceholder: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
   },
   title: { fontSize: FontSize.xl, fontWeight: "700" },
   nameText: { fontSize: FontSize.sm, marginTop: 2 },
+  settingsBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   sectionLabel: {
     fontSize: FontSize.xs,
     fontWeight: "700",
@@ -438,49 +283,49 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     marginBottom: Spacing.sm,
   },
-  chipRow: {
-    flexDirection: "row",
-    padding: Spacing.xs,
-    gap: Spacing.xs,
-    marginBottom: Spacing.sm,
-  },
-  chip: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    paddingVertical: Spacing.sm,
-    borderWidth: 1,
-  },
-  chipText: { fontSize: FontSize.sm, fontWeight: "600" },
   card: {
     overflow: "hidden",
     marginBottom: Spacing.md,
   },
-  settingsItem: {
+  listItem: {
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.lg,
   },
   itemBorder: { borderBottomWidth: StyleSheet.hairlineWidth },
-  iconBg: {
+  listItemIcon: {
     width: 36,
     height: 36,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
   },
-  settingsContent: { flex: 1 },
-  settingsTitle: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 1 },
-  settingsSubtitle: { fontSize: FontSize.xs },
+  listItemContent: { flex: 1 },
+  listItemTitle: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 1 },
+  listItemSubtitle: { fontSize: FontSize.xs },
+  settingsEntry: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  settingsEntryIcon: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  settingsEntryContent: { flex: 1 },
+  settingsEntryTitle: {
+    fontSize: FontSize.md,
+    fontWeight: "600",
+    marginBottom: 1,
+  },
+  settingsEntrySubtitle: { fontSize: FontSize.xs },
   version: {
     fontSize: FontSize.xs,
     textAlign: "center",
     marginTop: Spacing.xl,
-  },
-  brPreview: {
-    width: 18,
-    height: 14,
   },
 });

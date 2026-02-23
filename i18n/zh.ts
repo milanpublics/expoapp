@@ -119,6 +119,10 @@ export const zh: Translations = {
   home: "首页",
 
   tabSettings: "设置",
+  tabProfileCenter: "我的",
+  profileCenter: "个人中心",
+  settingsPage: "设置",
+  quickActions: "快捷功能",
   sharp: "方正",
   round: "圆润",
   medium: "适中",
