@@ -5,21 +5,21 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Linking,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.1.0";
 
 const INFO_ITEMS = [
   { labelKey: "version" as const, value: APP_VERSION },
   { labelKey: "techStack" as const, value: "React Native + Expo" },
-  { labelKey: "developer" as const, value: "Clean Tracker Team" },
+  { labelKey: "developer" as const, value: "R1cky" },
 ];
 
 export default function AboutScreen() {
@@ -134,7 +134,7 @@ export default function AboutScreen() {
         </TouchableOpacity>
 
         <Text style={[styles.footer, { color: colors.textMuted }]}>
-          Made with ❤️ using React Native & Expo
+          Made with ❤️ by R1cky
         </Text>
       </ScrollView>
     </SafeAreaView>
