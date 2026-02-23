@@ -7,11 +7,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -53,18 +53,6 @@ export default function SettingsPage() {
   };
 
   const generalItems = [
-    {
-      icon: "bell-outline",
-      title: t.notifications,
-      subtitle: t.configureAlerts,
-      action: () => {},
-    },
-    {
-      icon: "tag-multiple-outline",
-      title: t.manageTags,
-      subtitle: t.manageTagsDesc,
-      action: () => router.push("/manage-tags"),
-    },
     {
       icon: "cloud-upload-outline",
       title: t.backupSync,

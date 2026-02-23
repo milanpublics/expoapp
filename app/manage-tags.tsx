@@ -9,12 +9,12 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,6 +29,7 @@ export default function ManageTagsScreen() {
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<CustomTag | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadData = useCallback(async () => {
     const [allTags, allProjects] = await Promise.all([
@@ -104,6 +105,40 @@ export default function ManageTagsScreen() {
         <View style={{ width: 24 }} />
       </View>
 
+      {/* Search */}
+      <View
+        style={[
+          styles.searchBar,
+          {
+            backgroundColor: colors.cardBgLight,
+            borderRadius: borderRadius.lg,
+          },
+        ]}
+      >
+        <MaterialCommunityIcons
+          name="magnify"
+          size={20}
+          color={colors.textMuted}
+        />
+        <TextInput
+          style={[styles.searchInput, { color: colors.textPrimary }]}
+          placeholder={t.searchTags}
+          placeholderTextColor={colors.textMuted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCorrect={false}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <MaterialCommunityIcons
+              name="close-circle"
+              size={18}
+              color={colors.textMuted}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -125,54 +160,60 @@ export default function ManageTagsScreen() {
           </View>
         )}
 
-        {tags.map((tag) => (
-          <TouchableOpacity
-            key={tag.id}
-            activeOpacity={0.7}
-            onPress={() =>
-              router.push({
-                pathname: "/tag-projects",
-                params: { tagId: tag.id },
-              })
-            }
-          >
-            <View
-              style={[
-                styles.tagRow,
-                {
-                  backgroundColor: colors.cardBgLight,
-                  borderRadius: borderRadius.lg,
-                },
-              ]}
+        {tags
+          .filter((tag) =>
+            tag.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          )
+          .map((tag) => (
+            <TouchableOpacity
+              key={tag.id}
+              activeOpacity={0.7}
+              onPress={() =>
+                router.push({
+                  pathname: "/tag-projects",
+                  params: { tagId: tag.id },
+                })
+              }
             >
-              <View style={[styles.colorDot, { backgroundColor: tag.color }]} />
-              <View style={styles.tagInfo}>
-                <Text
-                  style={[styles.tagName, { color: colors.textPrimary }]}
-                  numberOfLines={1}
-                >
-                  {tag.name}
-                </Text>
-                <Text style={[styles.tagUsage, { color: colors.textMuted }]}>
-                  {t.tagUsedCount(tagUsage[tag.id] || 0)}
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={(e) => {
-                  e.stopPropagation();
-                  setDeleteTarget(tag);
-                }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              <View
+                style={[
+                  styles.tagRow,
+                  {
+                    backgroundColor: colors.cardBgLight,
+                    borderRadius: borderRadius.lg,
+                  },
+                ]}
               >
-                <MaterialCommunityIcons
-                  name="trash-can-outline"
-                  size={20}
-                  color={colors.danger}
+                <View
+                  style={[styles.colorDot, { backgroundColor: tag.color }]}
                 />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
+                <View style={styles.tagInfo}>
+                  <Text
+                    style={[styles.tagName, { color: colors.textPrimary }]}
+                    numberOfLines={1}
+                  >
+                    {tag.name}
+                  </Text>
+                  <Text style={[styles.tagUsage, { color: colors.textMuted }]}>
+                    {t.tagUsedCount(tagUsage[tag.id] || 0)}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(tag);
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={20}
+                    color={colors.danger}
+                  />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
 
         {/* Create tag inline */}
         {isCreating ? (
@@ -343,4 +384,19 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   addBtnText: { fontSize: FontSize.md, fontWeight: "600" },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: Spacing.xl,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: FontSize.md,
+    paddingVertical: 4,
+  },
 });

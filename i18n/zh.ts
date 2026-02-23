@@ -85,6 +85,7 @@ export const zh: Translations = {
   noTagsHint: "创建标签来组织你的项目",
   tagUsedCount: (n: number) => `在 ${n} 个项目中使用`,
   noProjectsForTag: "暂无项目使用此标签",
+  searchTags: "搜索标签...",
 
   settings: "设置",
   appearance: "外观",
@@ -126,6 +127,25 @@ export const zh: Translations = {
   sharp: "方正",
   round: "圆润",
   medium: "适中",
+
+  // Personal Center Menu
+  archivedProjects: "已归档项目",
+  archivedProjectsDesc: "查看已完成的项目",
+  searchProjects: "搜索项目...",
+  noArchivedProjects: "暂无归档项目",
+  noArchivedProjectsHint: "完成的项目会显示在这里",
+  exportData: "导出数据",
+  exportDataDesc: "将项目导出为 JSON",
+  exportSuccess: "数据导出成功",
+  exportError: "导出数据失败",
+  about: "关于",
+  aboutDesc: "版本和应用信息",
+  aboutApp: "关于 Clean Tracker",
+  version: "版本",
+  developer: "开发者",
+  techStack: "技术栈",
+  openSource: "开源",
+  feedbackEmail: "意见反馈",
 
   screenNotExist: "该页面不存在。",
   goHome: "返回首页",

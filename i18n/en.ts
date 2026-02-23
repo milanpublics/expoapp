@@ -91,6 +91,7 @@ export const en = {
   noTagsHint: "Create tags to organize your projects",
   tagUsedCount: (n: number) => `Used in ${n} project${n !== 1 ? "s" : ""}`,
   noProjectsForTag: "No projects use this tag yet",
+  searchTags: "Search tags...",
 
   // Settings
   settings: "Settings",
@@ -136,6 +137,25 @@ export const en = {
   sharp: "Sharp",
   round: "Round",
   medium: "Medium",
+
+  // Personal Center Menu
+  archivedProjects: "Archived Projects",
+  archivedProjectsDesc: "View completed projects",
+  searchProjects: "Search projects",
+  noArchivedProjects: "No archived projects",
+  noArchivedProjectsHint: "Completed projects will appear here",
+  exportData: "Export Data",
+  exportDataDesc: "Export projects as JSON",
+  exportSuccess: "Data exported successfully",
+  exportError: "Failed to export data",
+  about: "About",
+  aboutDesc: "Version and app info",
+  aboutApp: "About Clean Tracker",
+  version: "Version",
+  developer: "Developer",
+  techStack: "Tech Stack",
+  openSource: "Open Source",
+  feedbackEmail: "Feedback",
 
   // Not Found
   screenNotExist: "This screen doesn't exist.",

@@ -4,13 +4,15 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
 import { Project } from "@/types";
-import { getProjects } from "@/utils/storage";
+import { getProjects, getTags } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Alert,
   Image,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -35,30 +37,62 @@ export default function ProfileCenterScreen() {
   const screenHPadding = Spacing.xl * 2;
   const totalPadding = cardHPadding + screenHPadding;
 
-  const quickActions = [
+  const handleExportData = async () => {
+    try {
+      const [allProjects, allTags] = await Promise.all([
+        getProjects(),
+        getTags(),
+      ]);
+      const data = JSON.stringify(
+        { projects: allProjects, tags: allTags },
+        null,
+        2,
+      );
+      await Share.share({
+        message: data,
+        title: "Clean Tracker Data",
+      });
+    } catch {
+      Alert.alert(t.exportError);
+    }
+  };
+
+  const menuItems = [
     {
-      icon: "account-circle-outline" as const,
+      icon: "account-circle-outline",
       title: t.profile,
       subtitle: t.manageProfile,
       action: () => router.push("/profile"),
     },
     {
-      icon: "tag-multiple-outline" as const,
+      icon: "tag-multiple-outline",
       title: t.manageTags,
       subtitle: t.manageTagsDesc,
       action: () => router.push("/manage-tags"),
     },
     {
-      icon: "cloud-upload-outline" as const,
-      title: t.backupSync,
-      subtitle: t.cloudBackup,
-      action: () => {},
+      icon: "archive-outline",
+      title: t.archivedProjects,
+      subtitle: t.archivedProjectsDesc,
+      action: () => router.push("/archived-projects"),
     },
     {
-      icon: "bell-outline" as const,
-      title: t.notifications,
-      subtitle: t.configureAlerts,
-      action: () => {},
+      icon: "export-variant",
+      title: t.exportData,
+      subtitle: t.exportDataDesc,
+      action: handleExportData,
+    },
+    {
+      icon: "cog-outline",
+      title: t.settingsPage,
+      subtitle: `${t.appearance}, ${t.language}`,
+      action: () => router.push("/app-settings"),
+    },
+    {
+      icon: "information-outline",
+      title: t.about,
+      subtitle: t.aboutDesc,
+      action: () => router.push("/about"),
     },
   ];
 
@@ -140,9 +174,9 @@ export default function ProfileCenterScreen() {
           <ActivityGrid projects={projects} containerPadding={totalPadding} />
         </View>
 
-        {/* Quick Actions */}
+        {/* Menu */}
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.quickActions}
+          {t.general}
         </Text>
         <View
           style={[
@@ -150,12 +184,12 @@ export default function ProfileCenterScreen() {
             { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
           ]}
         >
-          {quickActions.map((item, index) => (
+          {menuItems.map((item, index) => (
             <TouchableOpacity
               key={item.title}
               style={[
                 styles.listItem,
-                index < quickActions.length - 1 && [
+                index < menuItems.length - 1 && [
                   styles.itemBorder,
                   { borderBottomColor: colors.border },
                 ],
@@ -165,7 +199,7 @@ export default function ProfileCenterScreen() {
             >
               <View style={styles.listItemIcon}>
                 <MaterialCommunityIcons
-                  name={item.icon}
+                  name={item.icon as any}
                   size={22}
                   color={colors.primary}
                 />
@@ -193,47 +227,6 @@ export default function ProfileCenterScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* Settings Entry */}
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.general}
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.settingsEntry,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
-          ]}
-          onPress={() => router.push("/app-settings")}
-          activeOpacity={0.7}
-        >
-          <View style={styles.settingsEntryIcon}>
-            <MaterialCommunityIcons
-              name="cog-outline"
-              size={22}
-              color={colors.primary}
-            />
-          </View>
-          <View style={styles.settingsEntryContent}>
-            <Text
-              style={[styles.settingsEntryTitle, { color: colors.textPrimary }]}
-            >
-              {t.settingsPage}
-            </Text>
-            <Text
-              style={[
-                styles.settingsEntrySubtitle,
-                { color: colors.textSecondary },
-              ]}
-            >
-              {t.appearance}, {t.language}, {t.general}
-            </Text>
-          </View>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={18}
-            color={colors.textMuted}
-          />
-        </TouchableOpacity>
 
         <Text style={[styles.version, { color: colors.textMuted }]}>
           Clean Tracker v1.0.0
@@ -303,26 +296,6 @@ const styles = StyleSheet.create({
   listItemContent: { flex: 1 },
   listItemTitle: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 1 },
   listItemSubtitle: { fontSize: FontSize.xs },
-  settingsEntry: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-  },
-  settingsEntryIcon: {
-    width: 36,
-    height: 36,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.md,
-  },
-  settingsEntryContent: { flex: 1 },
-  settingsEntryTitle: {
-    fontSize: FontSize.md,
-    fontWeight: "600",
-    marginBottom: 1,
-  },
-  settingsEntrySubtitle: { fontSize: FontSize.xs },
   version: {
     fontSize: FontSize.xs,
     textAlign: "center",

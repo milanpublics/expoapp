@@ -133,6 +133,20 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
+          name="archived-projects"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="about"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
           name="manage-tags"
           options={{
             headerShown: false,
