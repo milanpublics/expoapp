@@ -3,6 +3,7 @@ export interface Task {
   title: string;
   description?: string;
   completed: boolean;
+  completedAt?: string; // ISO date string, set when task is completed
   priority?: Priority;
 }
 

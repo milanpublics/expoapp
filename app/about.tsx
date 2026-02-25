@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  Image,
   Linking,
   ScrollView,
   StyleSheet,
@@ -58,23 +59,12 @@ export default function AboutScreen() {
       >
         {/* App Logo/Icon */}
         <View style={styles.logoContainer}>
-          <View
-            style={[
-              styles.logoBg,
-              {
-                backgroundColor: colors.primarySoft,
-                borderRadius: borderRadius.xl,
-              },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="clipboard-check-outline"
-              size={48}
-              color={colors.primary}
-            />
-          </View>
+          <Image
+            source={require("@/assets/images/appicon.png")}
+            style={[styles.logoImage, { borderRadius: borderRadius.xl }]}
+          />
           <Text style={[styles.appName, { color: colors.textPrimary }]}>
-            Clean Tracker
+            Vitrack
           </Text>
           <Text style={[styles.appVersion, { color: colors.textSecondary }]}>
             v{APP_VERSION}
@@ -127,7 +117,7 @@ export default function AboutScreen() {
             },
             cardShadow,
           ]}
-          onPress={() => Linking.openURL("mailto:feedback@cleantracker.app")}
+          onPress={() => Linking.openURL("mailto:me@r1cky.cc")}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -183,11 +173,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: Spacing.xl,
   },
-  logoBg: {
+  logoImage: {
     width: 88,
     height: 88,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: Spacing.md,
   },
   appName: {

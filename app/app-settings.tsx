@@ -7,11 +7,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -54,12 +54,6 @@ export default function SettingsPage() {
   };
 
   const generalItems = [
-    {
-      icon: "cloud-upload-outline",
-      title: t.backupSync,
-      subtitle: t.cloudBackup,
-      action: () => {},
-    },
     {
       icon: "trash-can-outline",
       title: t.resetData,
@@ -261,9 +255,9 @@ export default function SettingsPage() {
           })}
         </View>
 
-        {/* General */}
+        {/* Danger Zone */}
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-          {t.general}
+          {t.dangerZone}
         </Text>
         <View
           style={[
@@ -325,7 +319,7 @@ export default function SettingsPage() {
         </View>
 
         <Text style={[styles.version, { color: colors.textMuted }]}>
-          Clean Tracker v1.0.0
+          Vitrack v1.0.0
         </Text>
       </ScrollView>
 

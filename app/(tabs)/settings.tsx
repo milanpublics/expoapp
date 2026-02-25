@@ -6,13 +6,14 @@ import { useUser } from "@/contexts/UserContext";
 import { Project } from "@/types";
 import { getProjects, getTags } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { File, Paths } from "expo-file-system";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import * as Sharing from "expo-sharing";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   Image,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -26,6 +27,9 @@ export default function ProfileCenterScreen() {
   const { profile } = useUser();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [statsPeriod, setStatsPeriod] = useState<"week" | "month" | "year">(
+    "week",
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -36,6 +40,53 @@ export default function ProfileCenterScreen() {
   const cardHPadding = Spacing.md * 2;
   const screenHPadding = Spacing.xl * 2;
   const totalPadding = cardHPadding + screenHPadding;
+
+  const stats = useMemo(() => {
+    const now = new Date();
+    let periodStart: Date;
+    if (statsPeriod === "week") {
+      periodStart = new Date(now);
+      periodStart.setDate(now.getDate() - now.getDay());
+      periodStart.setHours(0, 0, 0, 0);
+    } else if (statsPeriod === "month") {
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else {
+      periodStart = new Date(now.getFullYear(), 0, 1);
+    }
+
+    const totalProjects = projects.length;
+    const activeCount = projects.filter((p) => p.status === "active").length;
+
+    // Period-scoped completed projects (created within period and completed)
+    const completedProjects = projects.filter(
+      (p) => p.status === "completed" && new Date(p.createdAt) >= periodStart,
+    ).length;
+
+    // Period-scoped tasks
+    let totalTasks = 0;
+    let completedTasks = 0;
+    for (const p of projects) {
+      for (const task of p.tasks) {
+        totalTasks++;
+        if (
+          task.completed &&
+          task.completedAt &&
+          new Date(task.completedAt) >= periodStart
+        ) {
+          completedTasks++;
+        }
+      }
+    }
+    const completionRate = totalTasks > 0 ? completedTasks / totalTasks : 0;
+    return {
+      totalProjects,
+      activeCount,
+      completedProjects,
+      totalTasks,
+      completedTasks,
+      completionRate,
+    };
+  }, [projects, statsPeriod]);
 
   const handleExportData = async () => {
     try {
@@ -48,9 +99,11 @@ export default function ProfileCenterScreen() {
         null,
         2,
       );
-      await Share.share({
-        message: data,
-        title: "Clean Tracker Data",
+      const file = new File(Paths.cache, "vitrack_export.json");
+      file.write(data);
+      await Sharing.shareAsync(file.uri, {
+        mimeType: "application/json",
+        dialogTitle: "Vitrack Data",
       });
     } catch {
       Alert.alert(t.exportError);
@@ -180,6 +233,162 @@ export default function ProfileCenterScreen() {
           <ActivityGrid projects={projects} containerPadding={totalPadding} />
         </View>
 
+        {/* Statistics */}
+        <View style={styles.statsHeader}>
+          <Text
+            style={[
+              styles.sectionLabel,
+              { color: colors.textSecondary, marginBottom: 0, marginTop: 0 },
+            ]}
+          >
+            {t.statistics}
+          </Text>
+          <View style={styles.periodChips}>
+            {(["week", "month", "year"] as const).map((p) => {
+              const active = statsPeriod === p;
+              return (
+                <TouchableOpacity
+                  key={p}
+                  onPress={() => setStatsPeriod(p)}
+                  style={[
+                    styles.periodChip,
+                    {
+                      backgroundColor: active ? colors.primary : "transparent",
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.periodChipText,
+                      { color: active ? "#fff" : colors.textSecondary },
+                    ]}
+                  >
+                    {t[p]}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Completion Ring */}
+        <View
+          style={[
+            styles.completionCard,
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
+          ]}
+        >
+          <View style={styles.ringContainer}>
+            {/* Ring background */}
+            <View style={[styles.ringBg, { borderColor: colors.surfaceBg }]}>
+              {/* Ring fill — use a half-circle overlay trick */}
+              <View style={styles.ringFillWrapper}>
+                <View
+                  style={[
+                    styles.ringHalf,
+                    {
+                      borderColor: colors.primary,
+                      transform: [
+                        {
+                          rotate: `${Math.min(stats.completionRate * 360, 360)}deg`,
+                        },
+                      ],
+                    },
+                    stats.completionRate > 0.5 && {
+                      borderRightColor: colors.primary,
+                      borderBottomColor: colors.primary,
+                    },
+                  ]}
+                />
+                {stats.completionRate > 0.5 && (
+                  <View
+                    style={[
+                      styles.ringHalfOverlay,
+                      { borderColor: colors.primary },
+                    ]}
+                  />
+                )}
+              </View>
+              <View
+                style={[
+                  styles.ringInner,
+                  { backgroundColor: colors.cardBgLight },
+                ]}
+              >
+                <Text
+                  style={[styles.ringPercentage, { color: colors.primary }]}
+                >
+                  {Math.round(stats.completionRate * 100)}%
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.completionMeta}>
+            <Text
+              style={[styles.completionTitle, { color: colors.textPrimary }]}
+            >
+              {t.completionRate}
+            </Text>
+            <Text
+              style={[styles.completionSub, { color: colors.textSecondary }]}
+            >
+              {stats.completedTasks}/{stats.totalTasks} {t.totalTasks}
+            </Text>
+          </View>
+        </View>
+
+        {/* Mini stat cards */}
+        <View style={styles.statsGrid}>
+          {[
+            {
+              label: t.completedTasksLabel,
+              value: stats.completedTasks,
+              color: colors.primary,
+            },
+            {
+              label: t.completedProjectsLabel,
+              value: stats.completedProjects,
+              color: colors.primary,
+            },
+            {
+              label: t.activeProjects,
+              value: stats.activeCount,
+              color: colors.amber,
+            },
+          ].map((item) => (
+            <View
+              key={item.label}
+              style={[
+                styles.miniStatCard,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  borderRadius: borderRadius.lg,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                },
+                cardShadow,
+              ]}
+            >
+              <Text style={[styles.miniStatValue, { color: item.color }]}>
+                {item.value}
+              </Text>
+              <Text
+                style={[styles.miniStatLabel, { color: colors.textSecondary }]}
+              >
+                {item.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+
         {/* Menu */}
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
           {t.general}
@@ -241,7 +450,7 @@ export default function ProfileCenterScreen() {
         </View>
 
         <Text style={[styles.version, { color: colors.textMuted }]}>
-          Clean Tracker v1.0.0
+          Vitrack v1.0.0
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -287,6 +496,109 @@ const styles = StyleSheet.create({
   heatmapCard: {
     padding: Spacing.md,
     marginBottom: Spacing.sm,
+  },
+  statsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  periodChips: {
+    flexDirection: "row",
+    gap: 4,
+  },
+  periodChip: {
+    paddingHorizontal: Spacing.sm + 2,
+    paddingVertical: 4,
+  },
+  periodChipText: {
+    fontSize: FontSize.xs,
+    fontWeight: "600",
+  },
+  completionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+  ringContainer: {
+    marginRight: Spacing.lg,
+  },
+  ringBg: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  ringFillWrapper: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  ringHalf: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 5,
+    borderLeftColor: "transparent",
+    borderBottomColor: "transparent",
+    top: -5,
+    left: -5,
+  },
+  ringHalfOverlay: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 5,
+    borderRightColor: "transparent",
+    borderBottomColor: "transparent",
+    top: -5,
+    left: -5,
+    transform: [{ rotate: "0deg" }],
+  },
+  ringInner: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ringPercentage: {
+    fontSize: FontSize.md,
+    fontWeight: "700",
+  },
+  completionMeta: {
+    flex: 1,
+  },
+  completionTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  completionSub: {
+    fontSize: FontSize.sm,
+  },
+  statsGrid: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  miniStatCard: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: Spacing.md,
+  },
+  miniStatValue: {
+    fontSize: FontSize.xl,
+    fontWeight: "700",
+  },
+  miniStatLabel: {
+    fontSize: FontSize.xs,
+    marginTop: 2,
   },
   card: {
     overflow: "hidden",

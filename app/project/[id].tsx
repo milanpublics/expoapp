@@ -59,7 +59,13 @@ export default function ProjectDetailScreen() {
     if (!project) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newTasks = project.tasks.map((t) =>
-      t.id === taskId ? { ...t, completed: !t.completed } : t,
+      t.id === taskId
+        ? {
+            ...t,
+            completed: !t.completed,
+            completedAt: !t.completed ? new Date().toISOString() : undefined,
+          }
+        : t,
     );
     const allDone = newTasks.length > 0 && newTasks.every((t) => t.completed);
     const wasCompleted = project.status === "completed";
@@ -110,7 +116,11 @@ export default function ProjectDetailScreen() {
     const updated = {
       ...project,
       status: "completed" as const,
-      tasks: project.tasks.map((t) => ({ ...t, completed: true })),
+      tasks: project.tasks.map((t) => ({
+        ...t,
+        completed: true,
+        completedAt: t.completedAt || new Date().toISOString(),
+      })),
     };
     setProject(updated);
     await updateProject(updated);
@@ -187,52 +197,24 @@ export default function ProjectDetailScreen() {
               color={colors.textPrimary}
             />
           </TouchableOpacity>
-          <View style={styles.headerRight}>
-            {project.status !== "completed" && (
-              <TouchableOpacity
-                onPress={toggleHold}
-                style={styles.headerBtn}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <MaterialCommunityIcons
-                  name={
-                    project.status === "on-hold"
-                      ? "play-circle-outline"
-                      : "pause-circle-outline"
-                  }
-                  size={22}
-                  color={colors.amber}
-                />
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/edit-project",
-                  params: { id: project.id },
-                })
-              }
-              style={styles.headerBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialCommunityIcons
-                name="pencil-outline"
-                size={22}
-                color={colors.textPrimary}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setDeleteDialogVisible(true)}
-              style={styles.headerBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialCommunityIcons
-                name="trash-can-outline"
-                size={22}
-                color={colors.danger}
-              />
-            </TouchableOpacity>
-          </View>
+          <Text
+            style={[styles.headerTitle, { color: colors.textPrimary }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {project.title}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setDeleteDialogVisible(true)}
+            style={styles.headerBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={22}
+              color={colors.danger}
+            />
+          </TouchableOpacity>
         </View>
 
         <ScrollView
@@ -248,8 +230,7 @@ export default function ProjectDetailScreen() {
                 {
                   borderRadius: borderRadius.lg,
                   overflow: "hidden",
-                  borderWidth: 1,
-                  borderColor: colors.cardBorder,
+                  backgroundColor: colors.cardBgLight,
                   marginBottom: Spacing.md,
                 },
                 cardShadow,
@@ -262,6 +243,67 @@ export default function ProjectDetailScreen() {
               />
             </View>
           ) : null}
+
+          {/* Action Buttons */}
+          <View style={styles.actionRow}>
+            {project.status !== "completed" && (
+              <TouchableOpacity
+                onPress={toggleHold}
+                style={[
+                  styles.actionBtn,
+                  {
+                    backgroundColor: colors.cardBgLight,
+                    borderRadius: borderRadius.md,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <MaterialCommunityIcons
+                  name={
+                    project.status === "on-hold"
+                      ? "play-circle-outline"
+                      : "pause-circle-outline"
+                  }
+                  size={18}
+                  color={colors.amber}
+                />
+                <Text style={[styles.actionBtnText, { color: colors.amber }]}>
+                  {project.status === "on-hold"
+                    ? t.resumeProject
+                    : t.pauseProject}
+                </Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/edit-project",
+                  params: { id: project.id },
+                })
+              }
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  borderRadius: borderRadius.md,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={18}
+                color={colors.primary}
+              />
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>
+                {t.editProject}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Project Info Card */}
           <View
@@ -276,10 +318,6 @@ export default function ProjectDetailScreen() {
               cardShadow,
             ]}
           >
-            <Text style={[styles.title, { color: colors.textPrimary }]}>
-              {project.title}
-            </Text>
-
             {/* Priority */}
             {(() => {
               const priDef = PRIORITY_LEVELS.find(
@@ -554,7 +592,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: BorderRadius.md,
   },
-  headerRight: { flexDirection: "row", gap: Spacing.xs },
+  headerTitle: {
+    flex: 1,
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    marginHorizontal: Spacing.sm,
+  },
+  actionRow: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  actionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: Spacing.sm + 2,
+  },
+  actionBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: "600",
+  },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: Spacing.xl },
   title: {

@@ -41,6 +41,8 @@ export const en = {
   due: "Due",
   loading: "Loading...",
   editProject: "Edit Project",
+  pauseProject: "Pause",
+  resumeProject: "Resume",
 
   // New / Edit Project
   create: "Create",
@@ -100,6 +102,7 @@ export const en = {
   dark: "Dark",
   system: "System",
   general: "GENERAL",
+  dangerZone: "DANGER",
   profile: "Profile",
   manageProfile: "Manage your profile",
   notifications: "Notifications",
@@ -116,6 +119,16 @@ export const en = {
     "All data has been reset. Pull down to refresh on the Home screen.",
   language: "LANGUAGE",
   activity: "ACTIVITY",
+  statistics: "STATISTICS",
+  totalProjects: "Projects",
+  totalTasks: "Tasks",
+  completionRate: "Done",
+  activeProjects: "Active",
+  completedTasksLabel: "Tasks Done",
+  completedProjectsLabel: "Projects Done",
+  week: "Week",
+  month: "Month",
+  year: "Year",
   borderRadius: "CORNER RADIUS",
 
   // Profile
@@ -150,7 +163,7 @@ export const en = {
   exportError: "Failed to export data",
   about: "About",
   aboutDesc: "Version and app info",
-  aboutApp: "About Clean Tracker",
+  aboutApp: "About Vitrack",
   version: "Version",
   developer: "Developer",
   techStack: "Tech Stack",

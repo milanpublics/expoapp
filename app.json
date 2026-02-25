@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Clean Tracker",
-    "slug": "clean-tracker",
+    "name": "Vitrack",
+    "slug": "vitrack",
     "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "cleantracker",
+    "scheme": "vitrack",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -23,7 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.richardbez.cleantracker"
+      "package": "com.richardbez.vitrack"
     },
     "web": {
       "bundler": "metro",

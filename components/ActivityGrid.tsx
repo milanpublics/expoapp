@@ -57,12 +57,16 @@ export default function ActivityGrid({
     const todayKey = dateKey(today);
 
     for (const p of projects) {
-      const created = new Date(p.createdAt);
-      const key = dateKey(created);
-      counts[key] = (counts[key] || 0) + 1;
+      // Count project creation
+      const createdKey = dateKey(new Date(p.createdAt));
+      counts[createdKey] = (counts[createdKey] || 0) + 1;
+      // Count task completions on their actual completion date
       for (const task of p.tasks) {
         if (task.completed) {
-          counts[key] = (counts[key] || 0) + 1;
+          const taskKey = task.completedAt
+            ? dateKey(new Date(task.completedAt))
+            : createdKey; // fallback for legacy tasks without completedAt
+          counts[taskKey] = (counts[taskKey] || 0) + 1;
         }
       }
     }
