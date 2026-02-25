@@ -5,11 +5,11 @@ import { PRIORITY_LEVELS, Task } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useRef } from "react";
 import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
@@ -20,7 +20,7 @@ interface TaskItemProps {
 }
 
 export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
-  const { colors } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const swipeableRef = useRef<Swipeable>(null);
 
@@ -39,21 +39,26 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
     });
 
     return (
-      <TouchableOpacity
-        style={[styles.deleteBtn, { backgroundColor: colors.danger }]}
-        onPress={() => {
-          swipeableRef.current?.close();
-          onDelete?.();
-        }}
-      >
-        <Animated.View style={{ transform: [{ scale }] }}>
-          <MaterialCommunityIcons
-            name="trash-can-outline"
-            size={24}
-            color="#FFF"
-          />
-        </Animated.View>
-      </TouchableOpacity>
+      <View style={[styles.deleteWrapper, { borderRadius: borderRadius.lg }]}>
+        <TouchableOpacity
+          style={[
+            styles.deleteBtn,
+            { backgroundColor: colors.danger, borderRadius: borderRadius.lg },
+          ]}
+          onPress={() => {
+            swipeableRef.current?.close();
+            onDelete?.();
+          }}
+        >
+          <Animated.View style={{ transform: [{ scale }] }}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={24}
+              color="#FFF"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -67,9 +72,12 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
         style={[
           styles.container,
           {
-            borderBottomColor: colors.border,
-            backgroundColor: colors.background,
+            backgroundColor: colors.cardBgLight,
+            borderWidth: 1,
+            borderColor: colors.cardBorder,
+            borderRadius: borderRadius.lg,
           },
+          cardShadow,
         ]}
         onPress={onToggle}
         activeOpacity={0.7}
@@ -137,7 +145,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   circle: {
     width: 24,
@@ -165,9 +174,15 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     marginTop: 2,
   },
+  deleteWrapper: {
+    overflow: "hidden",
+    marginBottom: Spacing.sm,
+    marginLeft: Spacing.xs,
+  },
   deleteBtn: {
     width: 80,
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
 });

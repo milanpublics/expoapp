@@ -49,7 +49,7 @@ export default function AppDialog({
               style={[
                 styles.card,
                 {
-                  backgroundColor: isDark ? colors.cardBg : "#FFFFFF",
+                  backgroundColor: isDark ? colors.cardBg : colors.cardBgLight,
                   borderRadius: borderRadius.xl,
                 },
               ]}

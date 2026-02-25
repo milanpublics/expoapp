@@ -23,7 +23,7 @@ const INFO_ITEMS = [
 ];
 
 export default function AboutScreen() {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
 
@@ -85,7 +85,13 @@ export default function AboutScreen() {
         <View
           style={[
             styles.card,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {INFO_ITEMS.map((item, index) => (
@@ -113,7 +119,13 @@ export default function AboutScreen() {
         <TouchableOpacity
           style={[
             styles.feedbackBtn,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
           onPress={() => Linking.openURL("mailto:feedback@cleantracker.app")}
           activeOpacity={0.7}

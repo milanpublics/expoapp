@@ -9,12 +9,12 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,7 +22,7 @@ const MAX_TAG_LENGTH = 8;
 
 export default function ManageTagsScreen() {
   const router = useRouter();
-  const { colors, isDark, borderRadius } = useTheme();
+  const { colors, isDark, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const [tags, setTags] = useState<CustomTag[]>([]);
   const [tagUsage, setTagUsage] = useState<Record<string, number>>({});
@@ -112,7 +112,10 @@ export default function ManageTagsScreen() {
           {
             backgroundColor: colors.cardBgLight,
             borderRadius: borderRadius.lg,
+            borderWidth: 1,
+            borderColor: colors.cardBorder,
           },
+          cardShadow,
         ]}
       >
         <MaterialCommunityIcons
@@ -181,7 +184,10 @@ export default function ManageTagsScreen() {
                   {
                     backgroundColor: colors.cardBgLight,
                     borderRadius: borderRadius.lg,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
                   },
+                  cardShadow,
                 ]}
               >
                 <View
@@ -223,7 +229,10 @@ export default function ManageTagsScreen() {
               {
                 backgroundColor: colors.cardBgLight,
                 borderRadius: borderRadius.lg,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
               },
+              cardShadow,
             ]}
           >
             <TextInput

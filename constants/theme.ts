@@ -24,6 +24,7 @@ export type ThemeColors = {
 
   // UI
   border: string;
+  cardBorder: string;
   overlay: string;
   danger: string;
 };
@@ -34,21 +35,22 @@ export const DarkColors: ThemeColors = {
   cardBgLight: "#242442",
   surfaceBg: "#2A2A4A",
 
-  primary: "#00E676",
-  primaryDark: "#00C853",
-  primarySoft: "rgba(0, 230, 118, 0.15)",
+  primary: "#00C853",
+  primaryDark: "#00A844",
+  primarySoft: "rgba(0, 200, 83, 0.15)",
 
   textPrimary: "#FFFFFF",
   textSecondary: "#9E9EA7",
   textMuted: "#6B6B7B",
 
-  green: "#00E676",
+  green: "#00C853",
   amber: "#FFD740",
   red: "#FF5252",
   blue: "#448AFF",
   gray: "#B0BEC5",
 
   border: "rgba(255,255,255,0.08)",
+  cardBorder: "rgba(255,255,255,0.06)",
   overlay: "rgba(0,0,0,0.5)",
   danger: "#FF5252",
 };
@@ -59,21 +61,22 @@ export const LightColors: ThemeColors = {
   cardBgLight: "#EBEBF3",
   surfaceBg: "#E3E3EC",
 
-  primary: "#00C853",
-  primaryDark: "#00A844",
-  primarySoft: "rgba(0, 200, 83, 0.12)",
+  primary: "#00A844",
+  primaryDark: "#008F3A",
+  primarySoft: "rgba(0, 168, 68, 0.12)",
 
   textPrimary: "#1A1A2E",
   textSecondary: "#6B6B7B",
   textMuted: "#9E9EA7",
 
-  green: "#00C853",
+  green: "#00A844",
   amber: "#F9A825",
   red: "#E53935",
   blue: "#1E88E5",
   gray: "#78909C",
 
   border: "rgba(0,0,0,0.08)",
+  cardBorder: "rgba(0,0,0,0.06)",
   overlay: "rgba(0,0,0,0.3)",
   danger: "#E53935",
 };

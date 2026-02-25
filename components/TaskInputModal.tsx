@@ -5,15 +5,15 @@ import { PRIORITY_LEVELS, Priority } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 
 interface TaskInputModalProps {
@@ -65,7 +65,7 @@ export default function TaskInputModal({
           style={[
             styles.container,
             {
-              backgroundColor: isDark ? colors.cardBg : "#FFFFFF",
+              backgroundColor: isDark ? colors.cardBg : colors.cardBgLight,
               borderTopLeftRadius: borderRadius.xl,
               borderTopRightRadius: borderRadius.xl,
             },
@@ -93,7 +93,7 @@ export default function TaskInputModal({
                 styles.input,
                 {
                   color: colors.textPrimary,
-                  backgroundColor: isDark ? "#ffffff10" : "#f5f5f5",
+                  backgroundColor: isDark ? "#ffffff10" : colors.surfaceBg,
                   borderRadius: borderRadius.md,
                 },
               ]}
@@ -110,7 +110,7 @@ export default function TaskInputModal({
                 styles.textArea,
                 {
                   color: colors.textPrimary,
-                  backgroundColor: isDark ? "#ffffff10" : "#f5f5f5",
+                  backgroundColor: isDark ? "#ffffff10" : colors.surfaceBg,
                   borderRadius: borderRadius.md,
                 },
               ]}
@@ -143,7 +143,7 @@ export default function TaskInputModal({
                             ? p.color + "25"
                             : isDark
                               ? "#ffffff10"
-                              : "#f5f5f5",
+                              : colors.surfaceBg,
                           borderColor: selected ? p.color : "transparent",
                           borderRadius: borderRadius.md,
                         },
@@ -179,7 +179,7 @@ export default function TaskInputModal({
               style={[
                 styles.btn,
                 {
-                  backgroundColor: isDark ? "#ffffff20" : "#e0e0e0",
+                  backgroundColor: isDark ? "#ffffff20" : colors.surfaceBg,
                   borderRadius: borderRadius.lg,
                 },
               ]}

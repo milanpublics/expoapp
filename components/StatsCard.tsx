@@ -17,13 +17,19 @@ export default function StatsCard({
   icon,
   color,
 }: StatsCardProps) {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
 
   return (
     <View
       style={[
         styles.card,
-        { backgroundColor: colors.cardBgLight, borderRadius: borderRadius.lg },
+        {
+          backgroundColor: colors.cardBgLight,
+          borderRadius: borderRadius.lg,
+          borderWidth: 1,
+          borderColor: colors.cardBorder,
+        },
+        cardShadow,
       ]}
     >
       <MaterialCommunityIcons

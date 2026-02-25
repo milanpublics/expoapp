@@ -6,7 +6,7 @@ import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 
 export default function TabLayout() {
-  const { colors } = useTheme();
+  const { colors, borderRadius } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
 
@@ -17,13 +17,23 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
-          backgroundColor: colors.cardBg,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
+          backgroundColor: colors.cardBgLight,
+          borderTopWidth: 0,
           height: Platform.OS === "android" ? 64 : 84,
           paddingBottom: Platform.OS === "android" ? 10 : 28,
           paddingTop: 8,
+          marginHorizontal: 16,
+          marginBottom: Platform.OS === "android" ? 8 : 0,
+          borderRadius: 999,
           elevation: 0,
+          borderWidth: 1,
+          borderColor: colors.cardBorder,
+          // subtle shadow
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.06,
+          shadowRadius: 8,
+          position: "absolute",
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -44,14 +54,23 @@ export default function TabLayout() {
         name="new"
         options={{
           title: "",
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View
-              style={[styles.centerBtn, { backgroundColor: colors.primary }]}
+              style={[
+                styles.addBtn,
+                {
+                  backgroundColor: colors.primary,
+                  borderRadius: borderRadius.full,
+                },
+              ]}
             >
-              <MaterialCommunityIcons name="plus" size={28} color="#FFFFFF" />
+              <MaterialCommunityIcons name="plus" size={24} color="#FFFFFF" />
             </View>
           ),
           tabBarLabel: () => null,
+          tabBarIconStyle: {
+            marginTop: Platform.OS === "android" ? 0 : 6,
+          },
         }}
         listeners={{
           tabPress: (e) => {
@@ -78,17 +97,10 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  centerBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  addBtn: {
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Platform.OS === "android" ? 20 : 24,
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
   },
 });

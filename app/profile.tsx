@@ -8,19 +8,19 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, cardShadow } = useTheme();
   const { t } = useI18n();
   const { profile, setName, setAvatar } = useUser();
   const [nameInput, setNameInput] = useState(profile.name);
@@ -157,19 +157,34 @@ export default function ProfileScreen() {
         <Text style={[styles.label, { color: colors.textSecondary }]}>
           {t.yourName}
         </Text>
-        <TextInput
+        <View
           style={[
-            styles.input,
-            { backgroundColor: colors.cardBgLight, color: colors.textPrimary },
+            {
+              borderRadius: BorderRadius.md,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+              overflow: "hidden",
+            },
+            cardShadow,
           ]}
-          placeholder={t.enterYourName}
-          placeholderTextColor={colors.textMuted}
-          value={nameInput}
-          onChangeText={setNameInput}
-          autoFocus={!profile.name}
-          returnKeyType="done"
-          onSubmitEditing={handleSave}
-        />
+        >
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.cardBgLight,
+                color: colors.textPrimary,
+              },
+            ]}
+            placeholder={t.enterYourName}
+            placeholderTextColor={colors.textMuted}
+            value={nameInput}
+            onChangeText={setNameInput}
+            autoFocus={!profile.name}
+            returnKeyType="done"
+            onSubmitEditing={handleSave}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

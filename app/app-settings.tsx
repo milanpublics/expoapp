@@ -7,11 +7,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -40,6 +40,7 @@ export default function SettingsPage() {
     borderRadiusScale,
     setBorderRadiusScale,
     borderRadius,
+    cardShadow,
   } = useTheme();
   const { t, lang, setLang } = useI18n();
   const router = useRouter();
@@ -104,7 +105,13 @@ export default function SettingsPage() {
         <View
           style={[
             styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.lg,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {THEME_OPTIONS.map((opt) => {
@@ -150,7 +157,13 @@ export default function SettingsPage() {
         <View
           style={[
             styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.lg,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {LANG_OPTIONS.map((opt) => {
@@ -191,7 +204,13 @@ export default function SettingsPage() {
         <View
           style={[
             styles.chipRow,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.lg,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {(
@@ -249,7 +268,13 @@ export default function SettingsPage() {
         <View
           style={[
             styles.card,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {generalItems.map((item, index) => (

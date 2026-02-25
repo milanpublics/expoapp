@@ -21,7 +21,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileCenterScreen() {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const { profile } = useUser();
   const router = useRouter();
@@ -142,13 +142,13 @@ export default function ProfileCenterScreen() {
               </Text>
             ) : null}
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => router.push("/app-settings")}
             activeOpacity={0.7}
             style={[
               styles.settingsBtn,
               {
-                backgroundColor: colors.cardBg,
+                backgroundColor: colors.cardBgLight,
                 borderRadius: borderRadius.md,
               },
             ]}
@@ -158,7 +158,7 @@ export default function ProfileCenterScreen() {
               size={22}
               color={colors.textSecondary}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Activity */}
@@ -168,7 +168,13 @@ export default function ProfileCenterScreen() {
         <View
           style={[
             styles.heatmapCard,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           <ActivityGrid projects={projects} containerPadding={totalPadding} />
@@ -181,7 +187,13 @@ export default function ProfileCenterScreen() {
         <View
           style={[
             styles.card,
-            { backgroundColor: colors.cardBg, borderRadius: borderRadius.xl },
+            {
+              backgroundColor: colors.cardBgLight,
+              borderRadius: borderRadius.xl,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            },
+            cardShadow,
           ]}
         >
           {menuItems.map((item, index) => (

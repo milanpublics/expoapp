@@ -16,7 +16,7 @@ export interface CategoryDef {
 
 export const PROJECT_CATEGORIES: CategoryDef[] = [
   { key: "work", icon: "briefcase-outline", color: "#448AFF" },
-  { key: "personal", icon: "account-outline", color: "#00E676" },
+  { key: "personal", icon: "account-outline", color: "#00C853" },
   { key: "study", icon: "school-outline", color: "#FFD740" },
   { key: "health", icon: "heart-pulse", color: "#FF5252" },
   { key: "finance", icon: "cash-multiple", color: "#E040FB" },
@@ -60,10 +60,10 @@ export function tagTextColor(hex: string): string {
 }
 
 export const PRIORITY_LEVELS: { key: Priority; color: string }[] = [
-  { key: "low", color: "#B0BEC5" },
-  { key: "medium", color: "#FFD740" },
-  { key: "high", color: "#FF9800" },
-  { key: "urgent", color: "#FF5252" },
+  { key: "low", color: "#90A4AE" },
+  { key: "medium", color: "#42A5F5" },
+  { key: "high", color: "#FFA726" },
+  { key: "urgent", color: "#EF5350" },
 ];
 
 export interface Project {

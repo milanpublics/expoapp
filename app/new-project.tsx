@@ -4,10 +4,10 @@ import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-  Priority,
-  PRIORITY_LEVELS,
-  Project,
-  PROJECT_CATEGORIES,
+    Priority,
+    PRIORITY_LEVELS,
+    Project,
+    PROJECT_CATEGORIES,
 } from "@/types";
 import { addProject } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -16,16 +16,16 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -33,7 +33,7 @@ const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function NewProjectScreen() {
   const router = useRouter();
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t, lang } = useI18n();
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(
@@ -204,21 +204,33 @@ export default function NewProjectScreen() {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t.projectName}
           </Text>
-          <TextInput
+          <View
             style={[
-              styles.input,
               {
-                backgroundColor: colors.cardBgLight,
-                color: colors.textPrimary,
                 borderRadius: borderRadius.md,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                overflow: "hidden",
               },
+              cardShadow,
             ]}
-            placeholder={t.enterProjectName}
-            placeholderTextColor={colors.textMuted}
-            value={title}
-            onChangeText={setTitle}
-            autoFocus
-          />
+          >
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  color: colors.textPrimary,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+              placeholder={t.enterProjectName}
+              placeholderTextColor={colors.textMuted}
+              value={title}
+              onChangeText={setTitle}
+              autoFocus
+            />
+          </View>
 
           {/* Priority */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
@@ -288,7 +300,10 @@ export default function NewProjectScreen() {
                 {
                   backgroundColor: colors.cardBgLight,
                   borderRadius: borderRadius.full,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
                 },
+                cardShadow,
               ]}
               onPress={pickImage}
             >
@@ -308,7 +323,10 @@ export default function NewProjectScreen() {
                   {
                     backgroundColor: colors.cardBgLight,
                     borderRadius: borderRadius.full,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
                   },
+                  cardShadow,
                 ]}
                 onPress={clearCustomIcon}
               >
@@ -323,23 +341,35 @@ export default function NewProjectScreen() {
               </TouchableOpacity>
             )}
           </View>
-          <TextInput
+          <View
             style={[
-              styles.input,
               {
-                backgroundColor: colors.cardBgLight,
-                color: colors.textPrimary,
                 borderRadius: borderRadius.md,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                overflow: "hidden",
               },
+              cardShadow,
             ]}
-            placeholder={t.orEnterUrl}
-            placeholderTextColor={colors.textMuted}
-            value={imageUrl}
-            onChangeText={setImageUrl}
-            onEndEditing={applyUrl}
-            autoCapitalize="none"
-            keyboardType="url"
-          />
+          >
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  color: colors.textPrimary,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+              placeholder={t.orEnterUrl}
+              placeholderTextColor={colors.textMuted}
+              value={imageUrl}
+              onChangeText={setImageUrl}
+              onEndEditing={applyUrl}
+              autoCapitalize="none"
+              keyboardType="url"
+            />
+          </View>
 
           {/* Due Date */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
@@ -352,7 +382,10 @@ export default function NewProjectScreen() {
                 {
                   backgroundColor: colors.cardBgLight,
                   borderRadius: borderRadius.md,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
                 },
+                cardShadow,
               ]}
               onPress={() => setShowDatePicker(true)}
             >
@@ -377,7 +410,10 @@ export default function NewProjectScreen() {
                   {
                     backgroundColor: colors.cardBgLight,
                     borderRadius: borderRadius.md,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
                   },
+                  cardShadow,
                 ]}
                 onPress={() => setDueDate(undefined)}
               >

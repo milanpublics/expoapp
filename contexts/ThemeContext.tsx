@@ -12,7 +12,11 @@ import React, {
     useMemo,
     useState,
 } from "react";
-import { useColorScheme as useSystemColorScheme } from "react-native";
+import {
+    Platform,
+    useColorScheme as useSystemColorScheme,
+    ViewStyle,
+} from "react-native";
 
 type ThemeMode = "light" | "dark" | "system";
 
@@ -24,6 +28,7 @@ interface ThemeContextType {
   borderRadiusScale: number;
   borderRadius: typeof DefaultBorderRadius;
   setBorderRadiusScale: (s: number) => void;
+  cardShadow: ViewStyle;
 }
 
 const THEME_KEY = "@tracker_theme_mode";
@@ -37,6 +42,7 @@ const ThemeContext = createContext<ThemeContextType>({
   borderRadiusScale: 1,
   borderRadius: DefaultBorderRadius,
   setBorderRadiusScale: () => {},
+  cardShadow: {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -92,6 +98,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [brScale]);
 
+  const cardShadow = useMemo<ViewStyle>(() => {
+    if (Platform.OS === "ios") {
+      return {
+        shadowColor: isDark ? "#000" : "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isDark ? 0.2 : 0.06,
+        shadowRadius: 6,
+      };
+    }
+    return { elevation: 1 };
+  }, [isDark]);
+
   const value = useMemo(
     () => ({
       colors,
@@ -101,8 +119,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       borderRadiusScale: brScale,
       borderRadius,
       setBorderRadiusScale,
+      cardShadow,
     }),
-    [colors, mode, isDark, brScale, borderRadius],
+    [colors, mode, isDark, brScale, borderRadius, cardShadow],
   );
 
   if (!loaded) return null;

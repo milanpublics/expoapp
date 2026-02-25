@@ -38,7 +38,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t, lang } = useI18n();
   const [project, setProject] = useState<Project | null>(null);
   const [allTags, setAllTags] = useState<CustomTag[]>([]);
@@ -243,151 +243,183 @@ export default function ProjectDetailScreen() {
         >
           {/* Banner Image */}
           {project.customIconUri ? (
-            <Image
-              source={{ uri: project.customIconUri }}
-              style={[styles.banner, { borderRadius: borderRadius.lg }]}
-              resizeMode="cover"
-            />
+            <View
+              style={[
+                {
+                  borderRadius: borderRadius.lg,
+                  overflow: "hidden",
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                  marginBottom: Spacing.md,
+                },
+                cardShadow,
+              ]}
+            >
+              <Image
+                source={{ uri: project.customIconUri }}
+                style={[styles.bannerInner, { borderRadius: borderRadius.lg }]}
+                resizeMode="cover"
+              />
+            </View>
           ) : null}
 
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
-            {project.title}
-          </Text>
+          {/* Project Info Card */}
+          <View
+            style={[
+              styles.infoCard,
+              {
+                backgroundColor: colors.cardBgLight,
+                borderRadius: borderRadius.xl,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+              },
+              cardShadow,
+            ]}
+          >
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
+              {project.title}
+            </Text>
 
-          {/* Priority */}
-          {(() => {
-            const priDef = PRIORITY_LEVELS.find(
-              (p) => p.key === project.priority,
-            );
-            const showPriority = !!priDef;
-            const showStatus =
-              project.status === "on-hold" || project.status === "completed";
-            if (!showPriority && !showStatus) return null;
-            return (
+            {/* Priority */}
+            {(() => {
+              const priDef = PRIORITY_LEVELS.find(
+                (p) => p.key === project.priority,
+              );
+              const showPriority = !!priDef;
+              const showStatus =
+                project.status === "on-hold" || project.status === "completed";
+              if (!showPriority && !showStatus) return null;
+              return (
+                <View style={styles.labeledSection}>
+                  <Text
+                    style={[styles.sectionLabel, { color: colors.textMuted }]}
+                  >
+                    {t.priority}
+                  </Text>
+                  <View style={styles.tagRow}>
+                    {priDef && (
+                      <View
+                        style={[
+                          styles.tag,
+                          { backgroundColor: priDef.color + "18" },
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.tagDot,
+                            { backgroundColor: priDef.color },
+                          ]}
+                        />
+                        <Text style={[styles.tagText, { color: priDef.color }]}>
+                          {(t as any)[`pri_${priDef.key}`] || priDef.key}
+                        </Text>
+                      </View>
+                    )}
+                    {project.status === "on-hold" && (
+                      <View
+                        style={[
+                          styles.tag,
+                          { backgroundColor: colors.amber + "18" },
+                        ]}
+                      >
+                        <MaterialCommunityIcons
+                          name="pause-circle-outline"
+                          size={13}
+                          color={colors.amber}
+                        />
+                        <Text style={[styles.tagText, { color: colors.amber }]}>
+                          {t.onHold}
+                        </Text>
+                      </View>
+                    )}
+                    {project.status === "completed" && (
+                      <View
+                        style={[
+                          styles.tag,
+                          { backgroundColor: colors.primary + "18" },
+                        ]}
+                      >
+                        <MaterialCommunityIcons
+                          name="check-circle-outline"
+                          size={13}
+                          color={colors.primary}
+                        />
+                        <Text
+                          style={[styles.tagText, { color: colors.primary }]}
+                        >
+                          {t.completedStatus}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              );
+            })()}
+
+            {/* Custom Tags */}
+            {project.tags && project.tags.length > 0 && (
               <View style={styles.labeledSection}>
                 <Text
                   style={[styles.sectionLabel, { color: colors.textMuted }]}
                 >
-                  {t.priority}
+                  {t.tags}
                 </Text>
                 <View style={styles.tagRow}>
-                  {priDef && (
-                    <View
-                      style={[
-                        styles.tag,
-                        { backgroundColor: priDef.color + "18" },
-                      ]}
-                    >
+                  {project.tags.map((tid) => {
+                    const tag = allTags.find((t) => t.id === tid);
+                    if (!tag) return null;
+                    return (
                       <View
-                        style={[
-                          styles.tagDot,
-                          { backgroundColor: priDef.color },
-                        ]}
-                      />
-                      <Text style={[styles.tagText, { color: priDef.color }]}>
-                        {(t as any)[`pri_${priDef.key}`] || priDef.key}
-                      </Text>
-                    </View>
-                  )}
-                  {project.status === "on-hold" && (
-                    <View
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.amber + "18" },
-                      ]}
-                    >
-                      <MaterialCommunityIcons
-                        name="pause-circle-outline"
-                        size={13}
-                        color={colors.amber}
-                      />
-                      <Text style={[styles.tagText, { color: colors.amber }]}>
-                        {t.onHold}
-                      </Text>
-                    </View>
-                  )}
-                  {project.status === "completed" && (
-                    <View
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "18" },
-                      ]}
-                    >
-                      <MaterialCommunityIcons
-                        name="check-circle-outline"
-                        size={13}
-                        color={colors.primary}
-                      />
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {t.completedStatus}
-                      </Text>
-                    </View>
-                  )}
+                        key={tag.id}
+                        style={[styles.tag, { backgroundColor: tag.color }]}
+                      >
+                        <View
+                          style={[
+                            styles.tagDot,
+                            { backgroundColor: tagTextColor(tag.color) },
+                          ]}
+                        />
+                        <Text
+                          style={[
+                            styles.tagText,
+                            { color: tagTextColor(tag.color) },
+                          ]}
+                        >
+                          {tag.name}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               </View>
-            );
-          })()}
+            )}
 
-          {/* Custom Tags */}
-          {project.tags && project.tags.length > 0 && (
-            <View style={styles.labeledSection}>
-              <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>
-                {t.tags}
-              </Text>
-              <View style={styles.tagRow}>
-                {project.tags.map((tid) => {
-                  const tag = allTags.find((t) => t.id === tid);
-                  if (!tag) return null;
-                  return (
-                    <View
-                      key={tag.id}
-                      style={[styles.tag, { backgroundColor: tag.color }]}
-                    >
-                      <View
-                        style={[
-                          styles.tagDot,
-                          { backgroundColor: tagTextColor(tag.color) },
-                        ]}
-                      />
-                      <Text
-                        style={[
-                          styles.tagText,
-                          { color: tagTextColor(tag.color) },
-                        ]}
-                      >
-                        {tag.name}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
-          )}
-
-          <View style={styles.meta}>
-            {formatDueDate() && (
+            <View style={styles.meta}>
+              {formatDueDate() && (
+                <View style={styles.metaItem}>
+                  <MaterialCommunityIcons
+                    name="calendar-outline"
+                    size={14}
+                    color={colors.textSecondary}
+                  />
+                  <Text
+                    style={[styles.metaText, { color: colors.textSecondary }]}
+                  >
+                    {t.due} {formatDueDate()}
+                  </Text>
+                </View>
+              )}
               <View style={styles.metaItem}>
-                <MaterialCommunityIcons
-                  name="calendar-outline"
-                  size={14}
-                  color={colors.textSecondary}
-                />
                 <Text
                   style={[styles.metaText, { color: colors.textSecondary }]}
                 >
-                  {t.due} {formatDueDate()}
+                  {completedCount}/{totalCount} {t.tasks}
                 </Text>
               </View>
-            )}
-            <View style={styles.metaItem}>
-              <Text style={[styles.metaText, { color: colors.textSecondary }]}>
-                {completedCount}/{totalCount} {t.tasks}
-              </Text>
             </View>
-          </View>
 
-          <ProgressBar progress={progress} label={t.progress} />
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <ProgressBar progress={progress} label={t.progress} />
+          </View>
 
           {(() => {
             const priorityOrder: Record<string, number> = {
@@ -416,9 +448,11 @@ export default function ProjectDetailScreen() {
             style={[
               styles.addTaskBtn,
               {
-                borderRadius: BorderRadius.lg,
-                // backgroundColor: isDark ? "#ffffff10" : "#f5f5f5",
+                borderRadius: borderRadius.lg,
+                borderColor: colors.cardBorder,
+                backgroundColor: colors.cardBgLight,
               },
+              cardShadow,
             ]}
             onPress={() => setTaskModalVisible(true)}
             activeOpacity={0.7}
@@ -533,6 +567,10 @@ const styles = StyleSheet.create({
     height: 140,
     marginBottom: Spacing.md,
   },
+  bannerInner: {
+    width: "100%",
+    height: 140,
+  },
   tagRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -578,11 +616,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: Spacing.md,
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
     marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: "transparent",
-    borderStyle: "dashed",
+  },
+  infoCard: {
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   addTaskText: {
     fontSize: FontSize.md,

@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ArchivedProjectsScreen() {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -42,7 +42,13 @@ export default function ArchivedProjectsScreen() {
       <TouchableOpacity
         style={[
           styles.card,
-          { backgroundColor: colors.cardBg, borderRadius: borderRadius.lg },
+          {
+            backgroundColor: colors.cardBgLight,
+            borderRadius: borderRadius.lg,
+            borderWidth: 1,
+            borderColor: colors.cardBorder,
+          },
+          cardShadow,
         ]}
         onPress={() => router.push(`/project/${item.id}`)}
         activeOpacity={0.7}
@@ -111,9 +117,12 @@ export default function ArchivedProjectsScreen() {
         style={[
           styles.searchBar,
           {
-            backgroundColor: colors.cardBg,
+            backgroundColor: colors.cardBgLight,
             borderRadius: borderRadius.lg,
+            borderWidth: 1,
+            borderColor: colors.cardBorder,
           },
+          cardShadow,
         ]}
       >
         <MaterialCommunityIcons

@@ -13,11 +13,11 @@ interface ProjectCardProps {
   faded?: boolean;
 }
 
-/** Softer priority colors for left accent strip — less saturated than raw PRIORITY_LEVELS */
+/** Softer priority colors for left accent indicator */
 const PRI_ACCENT: Record<string, string> = {
-  urgent: "#E05555",
-  high: "#E09040",
-  medium: "#D4B84A",
+  urgent: "#EF5350",
+  high: "#FFA726",
+  medium: "#42A5F5",
   low: "#90A4AE",
 };
 
@@ -26,7 +26,7 @@ export default function ProjectCard({
   onPress,
   faded,
 }: ProjectCardProps) {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const completedTasks = project.tasks.filter((t) => t.completed).length;
   const totalTasks = project.tasks.length;
@@ -93,23 +93,20 @@ export default function ProjectCard({
     <TouchableOpacity
       style={[
         styles.card,
-        { backgroundColor: colors.cardBgLight, borderRadius: borderRadius.lg },
+        {
+          backgroundColor: colors.cardBgLight,
+          borderRadius: borderRadius.lg,
+          borderWidth: 1,
+          borderColor: colors.cardBorder,
+        },
+        cardShadow,
         faded && { opacity: 0.5 },
       ]}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Priority accent strip - now full height */}
-      <View
-        style={[
-          styles.accentStrip,
-          {
-            backgroundColor: accentColor,
-            borderTopLeftRadius: borderRadius.lg,
-            borderBottomLeftRadius: borderRadius.lg,
-          },
-        ]}
-      />
+      {/* Priority accent indicator */}
+      <View style={[styles.accentStrip, { backgroundColor: accentColor }]} />
 
       {/* Content wrapper with padding */}
       <View style={styles.internalWrapper}>
@@ -208,8 +205,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   accentStrip: {
-    width: 6, // slightly wider for better visibility
+    width: 3,
     alignSelf: "stretch",
+    marginVertical: 10,
+    marginLeft: 10,
+    borderRadius: 2,
   },
   internalWrapper: {
     flex: 1,
