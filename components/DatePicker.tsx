@@ -4,12 +4,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 interface DatePickerProps {
@@ -148,7 +148,7 @@ export default function DatePicker({
               style={[
                 styles.card,
                 {
-                  backgroundColor: colors.cardBg,
+                  backgroundColor: colors.cardBgLight,
                   borderRadius: borderRadius.xl,
                 },
               ]}
