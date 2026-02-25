@@ -80,6 +80,7 @@ export interface Project {
   tasks: Task[];
   tags?: string[]; // CustomTag id array
   createdAt: string;
+  completedAt?: string;
 }
 
 export interface AppStats {

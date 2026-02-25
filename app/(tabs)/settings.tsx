@@ -57,10 +57,15 @@ export default function ProfileCenterScreen() {
     const totalProjects = projects.length;
     const activeCount = projects.filter((p) => p.status === "active").length;
 
-    // Period-scoped completed projects (created within period and completed)
-    const completedProjects = projects.filter(
-      (p) => p.status === "completed" && new Date(p.createdAt) >= periodStart,
-    ).length;
+    // Period-scoped completed projects
+    // For legacy projects without completedAt, fallback to createdAt or assume completed in period if missing
+    const completedProjects = projects.filter((p) => {
+      if (p.status !== "completed") return false;
+      const completedDate = p.completedAt
+        ? new Date(p.completedAt)
+        : new Date(p.createdAt);
+      return completedDate >= periodStart;
+    }).length;
 
     // Period-scoped tasks
     let totalTasks = 0;
@@ -68,12 +73,13 @@ export default function ProfileCenterScreen() {
     for (const p of projects) {
       for (const task of p.tasks) {
         totalTasks++;
-        if (
-          task.completed &&
-          task.completedAt &&
-          new Date(task.completedAt) >= periodStart
-        ) {
-          completedTasks++;
+        if (task.completed) {
+          const taskCompletedDate = task.completedAt
+            ? new Date(task.completedAt)
+            : new Date(p.createdAt);
+          if (taskCompletedDate >= periodStart) {
+            completedTasks++;
+          }
         }
       }
     }

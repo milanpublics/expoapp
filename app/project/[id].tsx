@@ -72,9 +72,10 @@ export default function ProjectDetailScreen() {
     let newStatus = project.status;
     if (allDone) newStatus = "completed";
     else if (wasCompleted) newStatus = "active";
-    const updated = {
+    const updated: Project = {
       ...project,
       tasks: newTasks,
+      completedAt: allDone ? new Date().toISOString() : undefined, // Set completedAt if all tasks are done, clear otherwise
       status: newStatus as Project["status"],
     };
     setProject(updated);
@@ -113,9 +114,10 @@ export default function ProjectDetailScreen() {
   const markComplete = async () => {
     if (!project) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const updated = {
+    const updated: Project = {
       ...project,
       status: "completed" as const,
+      completedAt: new Date().toISOString(),
       tasks: project.tasks.map((t) => ({
         ...t,
         completed: true,
