@@ -3,12 +3,7 @@ import TagSelector from "@/components/TagSelector";
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import {
-    Priority,
-    PRIORITY_LEVELS,
-    Project,
-    PROJECT_CATEGORIES,
-} from "@/types";
+import { Priority, PRIORITY_LEVELS, Project } from "@/types";
 import { getProject, updateProject } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -38,16 +33,13 @@ export default function EditProjectScreen() {
   const { t, lang } = useI18n();
   const [loaded, setLoaded] = useState(false);
   const [title, setTitle] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(
-    PROJECT_CATEGORIES[0].key,
-  );
+  const [description, setDescription] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [customIconUri, setCustomIconUri] = useState<string | undefined>(
     undefined,
   );
-  const [imageUrl, setImageUrl] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [originalProject, setOriginalProject] = useState<Project | null>(null);
 
@@ -57,25 +49,16 @@ export default function EditProjectScreen() {
         if (p) {
           setOriginalProject(p);
           setTitle(p.title);
-          setSelectedCategory(p.category || PROJECT_CATEGORIES[0].key);
+          setDescription(p.description || "");
           setSelectedPriority(p.priority || "medium");
           setDueDate(p.dueDate ? new Date(p.dueDate) : undefined);
           setCustomIconUri(p.customIconUri);
-          setImageUrl(
-            p.customIconUri && !p.customIconUri.startsWith("file")
-              ? p.customIconUri
-              : "",
-          );
           setSelectedTags(p.tags || []);
           setLoaded(true);
         }
       });
     }
   }, [id]);
-
-  const catDef =
-    PROJECT_CATEGORIES.find((c) => c.key === selectedCategory) ||
-    PROJECT_CATEGORIES[0];
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -86,7 +69,7 @@ export default function EditProjectScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [1, 1],
+      aspect: [16, 9],
       quality: 0.6,
     });
     if (!result.canceled && result.assets[0]) {
@@ -97,18 +80,7 @@ export default function EditProjectScreen() {
       }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setCustomIconUri(asset.uri);
-      setImageUrl("");
     }
-  };
-
-  const applyUrl = () => {
-    const url = imageUrl.trim();
-    if (url) setCustomIconUri(url);
-  };
-
-  const clearCustomIcon = () => {
-    setCustomIconUri(undefined);
-    setImageUrl("");
   };
 
   const handleSave = async () => {
@@ -117,34 +89,14 @@ export default function EditProjectScreen() {
     const updated: Project = {
       ...originalProject,
       title: title.trim(),
-      icon: catDef.icon,
+      description: description.trim() || undefined,
       customIconUri,
-      color: catDef.color,
-      category: selectedCategory,
       priority: selectedPriority,
       dueDate: dueDate ? dueDate.toISOString().slice(0, 10) : undefined,
       tags: selectedTags.length > 0 ? selectedTags : undefined,
     };
     await updateProject(updated);
     router.back();
-  };
-
-  const previewIcon = () => {
-    if (customIconUri) {
-      return (
-        <Image
-          source={{ uri: customIconUri }}
-          style={[styles.previewCustomIcon, { borderRadius: borderRadius.xl }]}
-        />
-      );
-    }
-    return (
-      <MaterialCommunityIcons
-        name={catDef.icon as any}
-        size={32}
-        color={catDef.color}
-      />
-    );
   };
 
   const formatDate = (d: Date) => {
@@ -165,7 +117,7 @@ export default function EditProjectScreen() {
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.header}>
           <TouchableOpacity
@@ -204,25 +156,39 @@ export default function EditProjectScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.previewCard}>
-            <View
-              style={[
-                styles.previewIcon,
-                {
-                  backgroundColor: customIconUri
-                    ? "transparent"
-                    : catDef.color + "20",
-                  borderRadius: borderRadius.xl,
-                },
-              ]}
+          {/* Banner Preview */}
+          <View
+            style={[
+              styles.bannerPreview,
+              {
+                borderRadius: borderRadius.lg,
+                backgroundColor: colors.cardBgLight,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                overflow: "hidden",
+              },
+              cardShadow,
+            ]}
+          >
+            <Image
+              source={
+                customIconUri
+                  ? { uri: customIconUri }
+                  : require("@/assets/images/icon.png")
+              }
+              style={styles.bannerImage}
+              resizeMode="cover"
+            />
+            <TouchableOpacity
+              style={styles.bannerEditBtn}
+              onPress={pickImage}
+              activeOpacity={0.7}
             >
-              {previewIcon()}
-            </View>
-            <Text style={[styles.previewTitle, { color: colors.textPrimary }]}>
-              {title || t.projectName}
-            </Text>
+              <MaterialCommunityIcons name="camera" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
 
+          {/* Name */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t.projectName}
           </Text>
@@ -250,6 +216,40 @@ export default function EditProjectScreen() {
               placeholderTextColor={colors.textMuted}
               value={title}
               onChangeText={setTitle}
+            />
+          </View>
+
+          {/* Description */}
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            {t.projectDescription}
+          </Text>
+          <View
+            style={[
+              {
+                borderRadius: borderRadius.md,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                overflow: "hidden",
+              },
+              cardShadow,
+            ]}
+          >
+            <TextInput
+              style={[
+                styles.input,
+                styles.textArea,
+                {
+                  backgroundColor: colors.cardBgLight,
+                  color: colors.textPrimary,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+              placeholder={t.enterProjectDescription}
+              placeholderTextColor={colors.textMuted}
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              textAlignVertical="top"
             />
           </View>
 
@@ -309,88 +309,6 @@ export default function EditProjectScreen() {
             }
             onTagCreated={(tag) => setSelectedTags((prev) => [...prev, tag.id])}
           />
-
-          {/* Custom Image */}
-          <Text style={[styles.label, { color: colors.textSecondary }]}>
-            {t.customImage}
-          </Text>
-          <View style={styles.customImageRow}>
-            <TouchableOpacity
-              style={[
-                styles.imageBtn,
-                {
-                  backgroundColor: colors.cardBgLight,
-                  borderRadius: borderRadius.full,
-                  borderWidth: 1,
-                  borderColor: colors.cardBorder,
-                },
-                cardShadow,
-              ]}
-              onPress={pickImage}
-            >
-              <MaterialCommunityIcons
-                name="image-plus"
-                size={20}
-                color={colors.primary}
-              />
-              <Text style={[styles.imageBtnText, { color: colors.primary }]}>
-                {t.chooseImage}
-              </Text>
-            </TouchableOpacity>
-            {customIconUri && (
-              <TouchableOpacity
-                style={[
-                  styles.imageBtn,
-                  {
-                    backgroundColor: colors.cardBgLight,
-                    borderRadius: borderRadius.full,
-                    borderWidth: 1,
-                    borderColor: colors.cardBorder,
-                  },
-                  cardShadow,
-                ]}
-                onPress={clearCustomIcon}
-              >
-                <MaterialCommunityIcons
-                  name="close-circle-outline"
-                  size={18}
-                  color={colors.danger}
-                />
-                <Text style={[styles.imageBtnText, { color: colors.danger }]}>
-                  {t.clearImage}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <View
-            style={[
-              {
-                borderRadius: borderRadius.md,
-                borderWidth: 1,
-                borderColor: colors.cardBorder,
-                overflow: "hidden",
-              },
-              cardShadow,
-            ]}
-          >
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.cardBgLight,
-                  color: colors.textPrimary,
-                  borderRadius: borderRadius.md,
-                },
-              ]}
-              placeholder={t.orEnterUrl}
-              placeholderTextColor={colors.textMuted}
-              value={imageUrl}
-              onChangeText={setImageUrl}
-              onEndEditing={applyUrl}
-              autoCapitalize="none"
-              keyboardType="url"
-            />
-          </View>
 
           {/* Due Date */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>
@@ -479,21 +397,27 @@ const styles = StyleSheet.create({
   saveBtnDisabled: { opacity: 0.3 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: Spacing.xl },
-  previewCard: {
-    alignItems: "center",
-    paddingVertical: Spacing.xxl,
+  bannerPreview: {
+    width: "100%",
+    height: 160,
     marginBottom: Spacing.lg,
+    position: "relative",
   },
-  previewIcon: {
-    width: 72,
-    height: 72,
+  bannerImage: {
+    width: "100%",
+    height: "100%",
+  },
+  bannerEditBtn: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(0,0,0,0.45)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Spacing.lg,
-    overflow: "hidden",
   },
-  previewCustomIcon: { width: 72, height: 72 },
-  previewTitle: { fontSize: FontSize.xl, fontWeight: "700" },
   label: {
     fontSize: FontSize.sm,
     fontWeight: "600",
@@ -507,16 +431,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md + 2,
     fontSize: FontSize.md,
   },
-  chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm },
-  catChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderWidth: 1.5,
+  textArea: {
+    height: 80,
   },
-  catChipText: { fontSize: FontSize.sm, fontWeight: "600" },
   priorityRow: { flexDirection: "row", gap: Spacing.sm },
   priChip: {
     flex: 1,
@@ -529,19 +446,6 @@ const styles = StyleSheet.create({
   },
   priDot: { width: 8, height: 8, borderRadius: 4 },
   priChipText: { fontSize: FontSize.sm, fontWeight: "600" },
-  customImageRow: {
-    flexDirection: "row",
-    gap: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  imageBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.xs,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-  },
-  imageBtnText: { fontSize: FontSize.sm, fontWeight: "600" },
   dateRow: { flexDirection: "row", gap: Spacing.md },
   dateBtn: {
     flexDirection: "row",

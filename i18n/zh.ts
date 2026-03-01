@@ -60,15 +60,9 @@ export const zh: Translations = {
   priority: "优先级",
   selectDate: "选择日期",
   clearDate: "清除",
-
-  cat_work: "工作",
-  cat_personal: "个人",
-  cat_study: "学习",
-  cat_health: "健康",
-  cat_finance: "财务",
-  cat_travel: "旅行",
-  cat_home: "家庭",
-  cat_other: "其他",
+  projectDescription: "项目描述（可选）",
+  enterProjectDescription: "输入项目描述",
+  descriptionLabel: "项目描述",
 
   pri_low: "低",
   pri_medium: "中",
@@ -144,6 +138,7 @@ export const zh: Translations = {
   // Personal Center Menu
   archivedProjects: "已归档项目",
   archivedProjectsDesc: "查看已完成的项目",
+  viewCompletedProjects: "查看已完成项目",
   searchProjects: "搜索项目...",
   noArchivedProjects: "暂无归档项目",
   noArchivedProjectsHint: "完成的项目会显示在这里",

@@ -62,16 +62,9 @@ export const en = {
   priority: "Priority",
   selectDate: "Select Date",
   clearDate: "Clear",
-
-  // Categories
-  cat_work: "Work",
-  cat_personal: "Personal",
-  cat_study: "Study",
-  cat_health: "Health",
-  cat_finance: "Finance",
-  cat_travel: "Travel",
-  cat_home: "Home",
-  cat_other: "Other",
+  projectDescription: "Description (optional)",
+  enterProjectDescription: "Enter project description",
+  descriptionLabel: "Description",
 
   // Priorities
   pri_low: "Low",
@@ -154,6 +147,7 @@ export const en = {
   // Personal Center Menu
   archivedProjects: "Archived Projects",
   archivedProjectsDesc: "View completed projects",
+  viewCompletedProjects: "View completed projects",
   searchProjects: "Search projects",
   noArchivedProjects: "No archived projects",
   noArchivedProjectsHint: "Completed projects will appear here",

@@ -10,13 +10,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    LayoutAnimation,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,13 +36,15 @@ function sortByPriority(a: Project, b: Project): number {
 }
 
 export default function HomeScreen() {
-  const { colors } = useTheme();
+  const { colors, borderRadius, cardShadow } = useTheme();
   const { t, lang } = useI18n();
   const { profile } = useUser();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [stats, setStats] = useState<AppStats>({ completed: 0, pending: 0 });
   const [refreshing, setRefreshing] = useState(false);
+  const [activeExpanded, setActiveExpanded] = useState(true);
+  const [onHoldExpanded, setOnHoldExpanded] = useState(false);
 
   const loadData = useCallback(async () => {
     const data = await getProjects();
@@ -80,26 +83,37 @@ export default function HomeScreen() {
     });
   };
 
-  const { active, onHold, completed } = useMemo(() => {
+  const { active, onHold } = useMemo(() => {
     const active = projects
       .filter((p) => p.status === "active")
       .sort(sortByPriority);
     const onHold = projects
       .filter((p) => p.status === "on-hold")
       .sort(sortByPriority);
-    const completed = projects.filter((p) => p.status === "completed");
-    return { active, onHold, completed };
+    return { active, onHold };
   }, [projects]);
 
   const displayName = profile.name ? `, ${profile.name}` : "";
 
-  const sectionLabel = (
+  const toggleSection = (section: "active" | "onHold") => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (section === "active") setActiveExpanded((prev) => !prev);
+    else setOnHoldExpanded((prev) => !prev);
+  };
+
+  const sectionHeader = (
     label: string,
     count: number,
     icon: string,
     color: string,
+    expanded: boolean,
+    onToggle: () => void,
   ) => (
-    <View style={styles.sectionRow}>
+    <TouchableOpacity
+      style={styles.sectionRow}
+      onPress={onToggle}
+      activeOpacity={0.7}
+    >
       <MaterialCommunityIcons name={icon as any} size={16} color={color} />
       <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
         {label}
@@ -107,8 +121,15 @@ export default function HomeScreen() {
       <View style={[styles.countBadge, { backgroundColor: color + "20" }]}>
         <Text style={[styles.countText, { color }]}>{count}</Text>
       </View>
-    </View>
+      <MaterialCommunityIcons
+        name={expanded ? "chevron-up" : "chevron-down"}
+        size={20}
+        color={colors.textMuted}
+      />
+    </TouchableOpacity>
   );
+
+  const hasNonCompleted = active.length > 0 || onHold.length > 0;
 
   return (
     <SafeAreaView
@@ -188,59 +209,89 @@ export default function HomeScreen() {
         {/* Active projects */}
         {active.length > 0 && (
           <>
-            {sectionLabel(
+            {sectionHeader(
               t.pending,
               active.length,
               "play-circle-outline",
               colors.primary,
+              activeExpanded,
+              () => toggleSection("active"),
             )}
-            {active.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onPress={() => router.push(`/project/${project.id}`)}
-              />
-            ))}
+            {activeExpanded &&
+              active.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onPress={() => router.push(`/project/${project.id}`)}
+                />
+              ))}
           </>
         )}
 
         {/* On Hold projects */}
         {onHold.length > 0 && (
           <>
-            {sectionLabel(
+            {sectionHeader(
               t.onHold,
               onHold.length,
               "pause-circle-outline",
               colors.amber,
+              onHoldExpanded,
+              () => toggleSection("onHold"),
             )}
-            {onHold.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onPress={() => router.push(`/project/${project.id}`)}
-              />
-            ))}
+            {onHoldExpanded &&
+              onHold.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onPress={() => router.push(`/project/${project.id}`)}
+                />
+              ))}
           </>
         )}
 
-        {/* Completed projects */}
-        {completed.length > 0 && (
-          <>
-            {sectionLabel(
-              t.completedStatus,
-              completed.length,
-              "check-circle-outline",
-              colors.green,
-            )}
-            {completed.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onPress={() => router.push(`/project/${project.id}`)}
-                faded
-              />
-            ))}
-          </>
+        {/* View Completed Projects button */}
+        {stats.completed > 0 && (
+          <TouchableOpacity
+            style={[
+              styles.completedBtn,
+              {
+                backgroundColor: colors.cardBgLight,
+                borderRadius: borderRadius.lg,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+              },
+              cardShadow,
+            ]}
+            onPress={() => router.push("/archived-projects")}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="check-circle-outline"
+              size={20}
+              color={colors.green}
+            />
+            <Text
+              style={[styles.completedBtnText, { color: colors.textSecondary }]}
+            >
+              {t.viewCompletedProjects}
+            </Text>
+            <View
+              style={[
+                styles.countBadge,
+                { backgroundColor: colors.green + "20" },
+              ]}
+            >
+              <Text style={[styles.countText, { color: colors.green }]}>
+                {stats.completed}
+              </Text>
+            </View>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={20}
+              color={colors.textMuted}
+            />
+          </TouchableOpacity>
         )}
 
         {/* Empty state */}
@@ -258,6 +309,20 @@ export default function HomeScreen() {
               style={[styles.emptySubtext, { color: colors.textSecondary }]}
             >
               {t.noProjectsHint}
+            </Text>
+          </View>
+        )}
+
+        {/* Also show empty if only completed projects exist */}
+        {!hasNonCompleted && projects.length > 0 && (
+          <View style={styles.allDoneState}>
+            <MaterialCommunityIcons
+              name="party-popper"
+              size={48}
+              color={colors.primary}
+            />
+            <Text style={[styles.emptyText, { color: colors.textPrimary }]}>
+              {t.allTasksDone}
             </Text>
           </View>
         )}
@@ -295,6 +360,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: Spacing.md,
     marginTop: Spacing.md,
+    paddingVertical: 4,
   },
   sectionTitle: { fontSize: FontSize.md, fontWeight: "700", flex: 1 },
   countBadge: {
@@ -303,7 +369,25 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
   },
   countText: { fontSize: FontSize.xs, fontWeight: "700" },
+  completedBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+    marginTop: Spacing.xl,
+  },
+  completedBtnText: {
+    flex: 1,
+    fontSize: FontSize.md,
+    fontWeight: "600",
+  },
   emptyState: { alignItems: "center", paddingVertical: Spacing.xxxl * 2 },
+  allDoneState: {
+    alignItems: "center",
+    paddingVertical: Spacing.xxxl,
+    gap: Spacing.md,
+  },
   emptyText: {
     fontSize: FontSize.lg,
     fontWeight: "600",

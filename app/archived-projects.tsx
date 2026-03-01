@@ -1,13 +1,14 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Project, PROJECT_CATEGORIES } from "@/types";
+import { Project } from "@/types";
 import { getProjects } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
     FlatList,
+    Image,
     StyleSheet,
     Text,
     TextInput,
@@ -31,11 +32,6 @@ export default function ArchivedProjectsScreen() {
     }, []),
   );
 
-  const getCategoryIcon = (key: string) => {
-    const cat = PROJECT_CATEGORIES.find((c) => c.key === key);
-    return cat?.icon || "folder-outline";
-  };
-
   const renderItem = ({ item }: { item: Project }) => {
     const completedTasks = item.tasks.filter((t) => t.completed).length;
     return (
@@ -55,17 +51,18 @@ export default function ArchivedProjectsScreen() {
       >
         <View
           style={[
-            styles.iconContainer,
-            {
-              backgroundColor: item.color + "20",
-              borderRadius: borderRadius.sm,
-            },
+            styles.thumbnailContainer,
+            { borderRadius: borderRadius.sm, overflow: "hidden" },
           ]}
         >
-          <MaterialCommunityIcons
-            name={getCategoryIcon(item.category) as any}
-            size={22}
-            color={item.color}
+          <Image
+            source={
+              item.customIconUri
+                ? { uri: item.customIconUri }
+                : require("@/assets/images/icon.png")
+            }
+            style={styles.thumbnailImage}
+            resizeMode="cover"
           />
         </View>
         <View style={styles.cardContent}>
@@ -209,12 +206,14 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     marginBottom: Spacing.sm,
   },
-  iconContainer: {
+  thumbnailContainer: {
     width: 40,
     height: 40,
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: Spacing.md,
+  },
+  thumbnailImage: {
+    width: 40,
+    height: 40,
   },
   cardContent: { flex: 1 },
   cardTitle: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 2 },

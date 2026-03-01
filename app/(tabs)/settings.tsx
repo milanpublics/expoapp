@@ -11,15 +11,16 @@ import { useFocusEffect, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Circle } from "react-native-svg";
 
 export default function ProfileCenterScreen() {
   const { colors, borderRadius, cardShadow } = useTheme();
@@ -293,49 +294,55 @@ export default function ProfileCenterScreen() {
           ]}
         >
           <View style={styles.ringContainer}>
-            {/* Ring background */}
-            <View style={[styles.ringBg, { borderColor: colors.surfaceBg }]}>
-              {/* Ring fill — use a half-circle overlay trick */}
-              <View style={styles.ringFillWrapper}>
+            {(() => {
+              const size = 64;
+              const strokeWidth = 5;
+              const radius = (size - strokeWidth) / 2;
+              const circumference = 2 * Math.PI * radius;
+              const offset = circumference * (1 - stats.completionRate);
+              return (
                 <View
-                  style={[
-                    styles.ringHalf,
-                    {
-                      borderColor: colors.primary,
-                      transform: [
-                        {
-                          rotate: `${Math.min(stats.completionRate * 360, 360)}deg`,
-                        },
-                      ],
-                    },
-                    stats.completionRate > 0.5 && {
-                      borderRightColor: colors.primary,
-                      borderBottomColor: colors.primary,
-                    },
-                  ]}
-                />
-                {stats.completionRate > 0.5 && (
-                  <View
-                    style={[
-                      styles.ringHalfOverlay,
-                      { borderColor: colors.primary },
-                    ]}
-                  />
-                )}
-              </View>
-              <View
-                style={[
-                  styles.ringInner,
-                  { backgroundColor: colors.cardBgLight },
-                ]}
-              >
-                <Text
-                  style={[styles.ringPercentage, { color: colors.primary }]}
+                  style={{
+                    width: size,
+                    height: size,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
-                  {Math.round(stats.completionRate * 100)}%
-                </Text>
-              </View>
-            </View>
+                  <Svg
+                    width={size}
+                    height={size}
+                    style={{ position: "absolute" }}
+                  >
+                    <Circle
+                      cx={size / 2}
+                      cy={size / 2}
+                      r={radius}
+                      stroke={colors.surfaceBg}
+                      strokeWidth={strokeWidth}
+                      fill="none"
+                    />
+                    <Circle
+                      cx={size / 2}
+                      cy={size / 2}
+                      r={radius}
+                      stroke={colors.primary}
+                      strokeWidth={strokeWidth}
+                      fill="none"
+                      strokeDasharray={`${circumference}`}
+                      strokeDashoffset={offset}
+                      strokeLinecap="round"
+                      transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                    />
+                  </Svg>
+                  <Text
+                    style={[styles.ringPercentage, { color: colors.primary }]}
+                  >
+                    {Math.round(stats.completionRate * 100)}%
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
           <View style={styles.completionMeta}>
             <Text
@@ -531,48 +538,7 @@ const styles = StyleSheet.create({
   ringContainer: {
     marginRight: Spacing.lg,
   },
-  ringBg: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  ringFillWrapper: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  ringHalf: {
-    position: "absolute",
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 5,
-    borderLeftColor: "transparent",
-    borderBottomColor: "transparent",
-    top: -5,
-    left: -5,
-  },
-  ringHalfOverlay: {
-    position: "absolute",
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 5,
-    borderRightColor: "transparent",
-    borderBottomColor: "transparent",
-    top: -5,
-    left: -5,
-    transform: [{ rotate: "0deg" }],
-  },
-  ringInner: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   ringPercentage: {
     fontSize: FontSize.md,
     fontWeight: "700",

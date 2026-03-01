@@ -21,9 +21,11 @@ import {
 } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -34,6 +36,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -91,6 +95,32 @@ export default function ProjectDetailScreen() {
     await updateProject(updated);
   };
 
+  const pickBannerImage = async () => {
+    if (!project) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("", "Permission to access the photo library is required.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.6,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      if (asset.fileSize && asset.fileSize > MAX_IMAGE_SIZE_BYTES) {
+        Alert.alert("", t.imageTooLarge);
+        return;
+      }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const updated = { ...project, customIconUri: asset.uri };
+      setProject(updated);
+      await updateProject(updated);
+    }
+  };
+
   const addTask = async (
     title: string,
     description: string,
@@ -105,7 +135,13 @@ export default function ProjectDetailScreen() {
       completed: false,
       priority: priority,
     };
-    const updated = { ...project, tasks: [...project.tasks, newTask] };
+    const updated: Project = {
+      ...project,
+      tasks: [...project.tasks, newTask],
+      status: project.status === "completed" ? "active" : project.status,
+      completedAt:
+        project.status === "completed" ? undefined : project.completedAt,
+    };
     setProject(updated);
     setTaskModalVisible(false);
     await updateProject(updated);
@@ -226,25 +262,35 @@ export default function ProjectDetailScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Banner Image */}
-          {project.customIconUri ? (
-            <View
-              style={[
-                {
-                  borderRadius: borderRadius.lg,
-                  overflow: "hidden",
-                  backgroundColor: colors.cardBgLight,
-                  marginBottom: Spacing.md,
-                },
-                cardShadow,
-              ]}
+          <View
+            style={[
+              {
+                borderRadius: borderRadius.lg,
+                overflow: "hidden",
+                backgroundColor: colors.cardBgLight,
+                marginBottom: Spacing.md,
+                position: "relative",
+              },
+              cardShadow,
+            ]}
+          >
+            <Image
+              source={
+                project.customIconUri
+                  ? { uri: project.customIconUri }
+                  : require("@/assets/images/icon.png")
+              }
+              style={[styles.bannerInner, { borderRadius: borderRadius.lg }]}
+              resizeMode="cover"
+            />
+            <TouchableOpacity
+              style={styles.bannerEditBtn}
+              onPress={pickBannerImage}
+              activeOpacity={0.7}
             >
-              <Image
-                source={{ uri: project.customIconUri }}
-                style={[styles.bannerInner, { borderRadius: borderRadius.lg }]}
-                resizeMode="cover"
-              />
-            </View>
-          ) : null}
+              <MaterialCommunityIcons name="camera" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
 
           {/* Action Buttons */}
           <View style={styles.actionRow}>
@@ -320,6 +366,28 @@ export default function ProjectDetailScreen() {
               cardShadow,
             ]}
           >
+            {/* Description */}
+            {project.description ? (
+              <View style={styles.descriptionSection}>
+                <Text
+                  style={[styles.sectionLabel, { color: colors.textMuted }]}
+                >
+                  {t.descriptionLabel}
+                </Text>
+                <Text
+                  style={[
+                    styles.descriptionText,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {project.description}
+                </Text>
+                <View
+                  style={[styles.divider, { backgroundColor: colors.border }]}
+                />
+              </View>
+            ) : null}
+
             {/* Priority */}
             {(() => {
               const priDef = PRIORITY_LEVELS.find(
@@ -628,6 +696,24 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 140,
     marginBottom: Spacing.md,
+  },
+  bannerEditBtn: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  descriptionSection: {
+    marginTop: Spacing.sm,
+  },
+  descriptionText: {
+    fontSize: FontSize.sm,
+    lineHeight: 20,
   },
   bannerInner: {
     width: "100%",

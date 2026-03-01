@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "vitrack",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    // "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0D0D1A"
       },
-      "edgeToEdgeEnabled": true,
+      // "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.richardbez.vitrack"
     },

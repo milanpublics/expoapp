@@ -1,8 +1,7 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { PRIORITY_LEVELS, Project, PROJECT_CATEGORIES } from "@/types";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { PRIORITY_LEVELS, Project } from "@/types";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
@@ -32,13 +31,8 @@ export default function ProjectCard({
   const totalTasks = project.tasks.length;
   const remaining = totalTasks - completedTasks;
 
-  const catDef =
-    PROJECT_CATEGORIES.find((c) => c.key === project.category) || null;
   const priDef =
     PRIORITY_LEVELS.find((p) => p.key === project.priority) || null;
-
-  const iconName = catDef?.icon || project.icon;
-  const iconColor = catDef?.color || project.color;
 
   const accentColor = PRI_ACCENT[project.priority] || PRI_ACCENT.low;
 
@@ -67,24 +61,6 @@ export default function ProjectCard({
     subtitle === t.dueToday ||
     subtitle === t.overdue;
 
-  const renderIcon = () => {
-    if (project.customIconUri) {
-      return (
-        <Image
-          source={{ uri: project.customIconUri }}
-          style={[styles.customIcon, { borderRadius: borderRadius.md }]}
-        />
-      );
-    }
-    return (
-      <MaterialCommunityIcons
-        name={iconName as any}
-        size={22}
-        color={faded ? colors.textMuted : iconColor}
-      />
-    );
-  };
-
   const priLabel = priDef
     ? (t as any)[`pri_${priDef.key}`] || priDef.key
     : null;
@@ -110,19 +86,24 @@ export default function ProjectCard({
 
       {/* Content wrapper with padding */}
       <View style={styles.internalWrapper}>
+        {/* Banner thumbnail */}
         <View
           style={[
-            styles.iconContainer,
-            {
-              backgroundColor: project.customIconUri
-                ? "transparent"
-                : iconColor + "20",
-              borderRadius: borderRadius.md,
-            },
+            styles.thumbnailContainer,
+            { borderRadius: borderRadius.md, overflow: "hidden" },
           ]}
         >
-          {renderIcon()}
+          <Image
+            source={
+              project.customIconUri
+                ? { uri: project.customIconUri }
+                : require("@/assets/images/icon.png")
+            }
+            style={styles.thumbnailImage}
+            resizeMode="cover"
+          />
         </View>
+
         <View style={styles.content}>
           <Text
             style={[
@@ -200,7 +181,7 @@ export default function ProjectCard({
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    padding: 0, // removed padding to allow strip to be full height
+    padding: 0,
     marginBottom: Spacing.sm,
     overflow: "hidden",
   },
@@ -218,15 +199,15 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     paddingLeft: Spacing.md,
   },
-  iconContainer: {
+  thumbnailContainer: {
     width: 42,
     height: 42,
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: Spacing.md,
-    overflow: "hidden",
   },
-  customIcon: { width: 42, height: 42 },
+  thumbnailImage: {
+    width: 42,
+    height: 42,
+  },
   content: { flex: 1 },
   title: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 3 },
   metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
