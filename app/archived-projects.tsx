@@ -1,8 +1,8 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Project } from "@/types";
-import { getProjects } from "@/utils/storage";
+import { CustomTag, Project, tagTextColor } from "@/types";
+import { getProjects, getTags } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -22,6 +22,7 @@ export default function ArchivedProjectsScreen() {
   const { t } = useI18n();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [allTags, setAllTags] = useState<CustomTag[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useFocusEffect(
@@ -29,6 +30,7 @@ export default function ArchivedProjectsScreen() {
       getProjects().then((all) =>
         setProjects(all.filter((p) => p.status === "completed")),
       );
+      getTags().then(setAllTags);
     }, []),
   );
 
@@ -75,6 +77,29 @@ export default function ArchivedProjectsScreen() {
           <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
             {completedTasks}/{item.tasks.length} {t.tasks}
           </Text>
+          {allTags.length > 0 && item.tags && item.tags.length > 0 && (
+            <View style={styles.tagsRow}>
+              {item.tags.map((tid) => {
+                const tag = allTags.find((t) => t.id === tid);
+                if (!tag) return null;
+                return (
+                  <View
+                    key={tag.id}
+                    style={[styles.tagChip, { backgroundColor: tag.color }]}
+                  >
+                    <Text
+                      style={[
+                        styles.tagChipText,
+                        { color: tagTextColor(tag.color) },
+                      ]}
+                    >
+                      {tag.name}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </View>
         <MaterialCommunityIcons
           name="check-circle"
@@ -218,6 +243,21 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1 },
   cardTitle: { fontSize: FontSize.md, fontWeight: "600", marginBottom: 2 },
   cardSubtitle: { fontSize: FontSize.xs },
+  tagsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+    marginTop: 4,
+  },
+  tagChip: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 999,
+  },
+  tagChipText: {
+    fontSize: 9,
+    fontWeight: "600",
+  },
   emptyContainer: {
     flex: 1,
     alignItems: "center",

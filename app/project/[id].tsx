@@ -6,18 +6,18 @@ import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-  CustomTag,
-  Priority,
-  PRIORITY_LEVELS,
-  Project,
-  tagTextColor,
-  Task,
+    CustomTag,
+    Priority,
+    PRIORITY_LEVELS,
+    Project,
+    tagTextColor,
+    Task,
 } from "@/types";
 import {
-  deleteProject,
-  getProject,
-  getTags,
-  updateProject,
+    deleteProject,
+    getProject,
+    getTags,
+    updateProject,
 } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -25,15 +25,15 @@ import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -529,29 +529,6 @@ export default function ProjectDetailScreen() {
             <ProgressBar progress={progress} label={t.progress} />
           </View>
 
-          {(() => {
-            const priorityOrder: Record<string, number> = {
-              urgent: 0,
-              high: 1,
-              medium: 2,
-              low: 3,
-            };
-            const sorted = [...project.tasks].sort((a, b) => {
-              if (a.completed !== b.completed) return a.completed ? 1 : -1;
-              const pa = priorityOrder[a.priority || "medium"] ?? 2;
-              const pb = priorityOrder[b.priority || "medium"] ?? 2;
-              return pa - pb;
-            });
-            return sorted.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onToggle={() => toggleTask(task.id)}
-                onDelete={() => confirmTaskDelete(task.id)}
-              />
-            ));
-          })()}
-
           <TouchableOpacity
             style={[
               styles.addTaskBtn,
@@ -579,6 +556,29 @@ export default function ProjectDetailScreen() {
               {t.addNewTask}
             </Text>
           </TouchableOpacity>
+
+          {(() => {
+            const priorityOrder: Record<string, number> = {
+              urgent: 0,
+              high: 1,
+              medium: 2,
+              low: 3,
+            };
+            const sorted = [...project.tasks].sort((a, b) => {
+              if (a.completed !== b.completed) return a.completed ? 1 : -1;
+              const pa = priorityOrder[a.priority || "medium"] ?? 2;
+              const pb = priorityOrder[b.priority || "medium"] ?? 2;
+              return pa - pb;
+            });
+            return sorted.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={() => toggleTask(task.id)}
+                onDelete={() => confirmTaskDelete(task.id)}
+              />
+            ));
+          })()}
 
           <View style={{ height: 100 }} />
         </ScrollView>

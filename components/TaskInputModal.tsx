@@ -54,7 +54,7 @@ export default function TaskInputModal({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.overlay}
       >
         <TouchableWithoutFeedback onPress={onClose}>
