@@ -17,9 +17,15 @@ interface TaskItemProps {
   task: Task;
   onToggle: () => void;
   onDelete?: () => void;
+  onDetail?: () => void;
 }
 
-export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
+export default function TaskItem({
+  task,
+  onToggle,
+  onDelete,
+  onDetail,
+}: TaskItemProps) {
   const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
   const swipeableRef = useRef<Swipeable>(null);
@@ -79,27 +85,33 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
           },
           cardShadow,
         ]}
-        onPress={onToggle}
+        onPress={onDetail}
         activeOpacity={0.7}
       >
-        <View
-          style={[
-            styles.circle,
-            { borderColor: colors.textMuted },
-            task.completed && {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
+        <TouchableOpacity
+          onPress={onToggle}
+          activeOpacity={0.6}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
         >
-          {task.completed && (
-            <MaterialCommunityIcons
-              name="check"
-              size={14}
-              color={colors.background}
-            />
-          )}
-        </View>
+          <View
+            style={[
+              styles.circle,
+              { borderColor: colors.textMuted },
+              task.completed && {
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
+            ]}
+          >
+            {task.completed && (
+              <MaterialCommunityIcons
+                name="check"
+                size={14}
+                color={colors.background}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.content}>
           <View style={styles.titleRow}>
@@ -126,15 +138,14 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
                 />
               )}
           </View>
-          {task.description ? (
-            <Text
-              style={[styles.description, { color: colors.textSecondary }]}
-              numberOfLines={1}
-            >
-              {task.description}
-            </Text>
-          ) : null}
         </View>
+
+        <MaterialCommunityIcons
+          name="text-box-outline"
+          size={18}
+          color={colors.textMuted}
+          style={{ marginLeft: 4 }}
+        />
       </TouchableOpacity>
     </Swipeable>
   );
@@ -169,10 +180,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: "500",
     flexShrink: 1,
-  },
-  description: {
-    fontSize: FontSize.xs,
-    marginTop: 2,
   },
   deleteWrapper: {
     overflow: "hidden",

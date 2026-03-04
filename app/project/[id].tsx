@@ -1,23 +1,24 @@
 import AppDialog from "@/components/AppDialog";
 import ProgressBar from "@/components/ProgressBar";
+import TaskDetailDrawer from "@/components/TaskDetailDrawer";
 import TaskInputModal from "@/components/TaskInputModal";
 import TaskItem from "@/components/TaskItem";
 import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-    CustomTag,
-    Priority,
-    PRIORITY_LEVELS,
-    Project,
-    tagTextColor,
-    Task,
+  CustomTag,
+  Priority,
+  PRIORITY_LEVELS,
+  Project,
+  tagTextColor,
+  Task,
 } from "@/types";
 import {
-    deleteProject,
-    getProject,
-    getTags,
-    updateProject,
+  deleteProject,
+  getProject,
+  getTags,
+  updateProject,
 } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -25,15 +26,15 @@ import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -49,6 +50,7 @@ export default function ProjectDetailScreen() {
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [taskModalVisible, setTaskModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [detailTask, setDetailTask] = useState<Task | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -576,6 +578,7 @@ export default function ProjectDetailScreen() {
                 task={task}
                 onToggle={() => toggleTask(task.id)}
                 onDelete={() => confirmTaskDelete(task.id)}
+                onDetail={() => setDetailTask(task)}
               />
             ));
           })()}
@@ -639,6 +642,12 @@ export default function ProjectDetailScreen() {
           { label: t.cancel, onPress: () => setTaskToDelete(null) },
           { label: t.deleteTask, onPress: deleteTask, destructive: true },
         ]}
+      />
+
+      <TaskDetailDrawer
+        task={detailTask}
+        visible={!!detailTask}
+        onClose={() => setDetailTask(null)}
       />
     </SafeAreaView>
   );
