@@ -3,6 +3,7 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { PRIORITY_LEVELS, Task } from "@/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import React from "react";
 import {
     Modal,
@@ -47,7 +48,11 @@ export default function TaskDetailDrawer({
     >
       <View style={styles.overlay}>
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.backdrop} />
+          <BlurView
+            intensity={30}
+            tint={isDark ? "dark" : "light"}
+            style={styles.backdrop}
+          />
         </TouchableWithoutFeedback>
 
         <View

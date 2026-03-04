@@ -29,14 +29,10 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-font",
-      "expo-sharing",
-      "expo-web-browser"
-    ],
+    "plugins": ["expo-router", "expo-font", "expo-sharing", "expo-web-browser"],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "extra": {
       "router": {},
