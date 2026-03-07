@@ -1,7 +1,7 @@
 import { FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { CustomTag, PRIORITY_LEVELS, Project, tagTextColor } from "@/types";
+import { PRIORITY_LEVELS, Project } from "@/types";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
@@ -10,7 +10,6 @@ interface ProjectCardProps {
   project: Project;
   onPress: () => void;
   faded?: boolean;
-  allTags?: CustomTag[];
 }
 
 /** Softer priority colors for left accent indicator */
@@ -25,7 +24,6 @@ export default function ProjectCard({
   project,
   onPress,
   faded,
-  allTags,
 }: ProjectCardProps) {
   const { colors, borderRadius, cardShadow } = useTheme();
   const { t } = useI18n();
@@ -81,7 +79,7 @@ export default function ProjectCard({
         faded && { opacity: 0.5 },
       ]}
       onPress={onPress}
-      activeOpacity={0.7}
+      activeOpacity={0.85}
     >
       {/* Priority accent indicator */}
       <View style={[styles.accentStrip, { backgroundColor: accentColor }]} />
@@ -142,29 +140,6 @@ export default function ProjectCard({
               </View>
             )}
           </View>
-          {allTags && project.tags && project.tags.length > 0 && (
-            <View style={styles.tagsRow}>
-              {project.tags.map((tid) => {
-                const tag = allTags.find((t) => t.id === tid);
-                if (!tag) return null;
-                return (
-                  <View
-                    key={tag.id}
-                    style={[styles.tagChip, { backgroundColor: tag.color }]}
-                  >
-                    <Text
-                      style={[
-                        styles.tagChipText,
-                        { color: tagTextColor(tag.color) },
-                      ]}
-                    >
-                      {tag.name}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
-          )}
         </View>
 
         {/* Progress Ring */}
@@ -247,21 +222,6 @@ const styles = StyleSheet.create({
   },
   priDot: { width: 6, height: 6, borderRadius: 3 },
   priText: { fontSize: 10, fontWeight: "600" },
-  tagsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
-    marginTop: 4,
-  },
-  tagChip: {
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 999,
-  },
-  tagChipText: {
-    fontSize: 9,
-    fontWeight: "600",
-  },
 
   progressContainer: {
     justifyContent: "center",

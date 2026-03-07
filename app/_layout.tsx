@@ -3,9 +3,9 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider as NavThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider as NavThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -13,6 +13,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -34,7 +35,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      // Small delay before hiding splash for smoother content transition
+      const timer = setTimeout(() => SplashScreen.hideAsync(), 200);
+      return () => clearTimeout(timer);
     }
   }, [loaded]);
 
@@ -44,13 +47,15 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <I18nProvider>
-          <UserProvider>
-            <RootLayoutNav />
-          </UserProvider>
-        </I18nProvider>
-      </ThemeProvider>
+      <Animated.View style={{ flex: 1 }} entering={FadeIn.duration(400)}>
+        <ThemeProvider>
+          <I18nProvider>
+            <UserProvider>
+              <RootLayoutNav />
+            </UserProvider>
+          </I18nProvider>
+        </ThemeProvider>
+      </Animated.View>
     </GestureHandlerRootView>
   );
 }
@@ -91,6 +96,8 @@ function RootLayoutNav() {
           headerTintColor: colors.textPrimary,
           headerShadowVisible: false,
           contentStyle: { backgroundColor: colors.background },
+          animationDuration: 250,
+          gestureEnabled: true,
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -106,7 +113,7 @@ function RootLayoutNav() {
           options={{
             presentation: "modal",
             headerShown: false,
-            animation: "slide_from_bottom",
+            animation: "fade_from_bottom",
           }}
         />
         <Stack.Screen
@@ -114,7 +121,7 @@ function RootLayoutNav() {
           options={{
             presentation: "modal",
             headerShown: false,
-            animation: "slide_from_bottom",
+            animation: "fade_from_bottom",
           }}
         />
         <Stack.Screen
@@ -122,7 +129,7 @@ function RootLayoutNav() {
           options={{
             presentation: "modal",
             headerShown: false,
-            animation: "slide_from_bottom",
+            animation: "fade_from_bottom",
           }}
         />
         <Stack.Screen

@@ -4,8 +4,8 @@ import { BorderRadius, FontSize, Spacing } from "@/constants/theme";
 import { useI18n } from "@/contexts/I18nContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
-import { AppStats, CustomTag, Priority, Project } from "@/types";
-import { getProjects, getTags } from "@/utils/storage";
+import { AppStats, Priority, Project } from "@/types";
+import { getProjects } from "@/utils/storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -41,7 +41,6 @@ export default function HomeScreen() {
   const { profile } = useUser();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [allTags, setAllTags] = useState<CustomTag[]>([]);
   const [stats, setStats] = useState<AppStats>({ completed: 0, pending: 0 });
   const [refreshing, setRefreshing] = useState(false);
   const [activeExpanded, setActiveExpanded] = useState(true);
@@ -50,8 +49,6 @@ export default function HomeScreen() {
   const loadData = useCallback(async () => {
     const data = await getProjects();
     setProjects(data);
-    const tags = await getTags();
-    setAllTags(tags);
     const completed = data.filter((p) => p.status === "completed").length;
     const pending = data.filter((p) => p.status !== "completed").length;
     setStats({ completed, pending });
@@ -226,7 +223,6 @@ export default function HomeScreen() {
                   key={project.id}
                   project={project}
                   onPress={() => router.push(`/project/${project.id}`)}
-                  allTags={allTags}
                 />
               ))}
           </>
